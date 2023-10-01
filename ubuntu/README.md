@@ -11,4 +11,6 @@ To use the script, follow these steps:
 2. Run the script with the following command:
 
    ```bash
+   chmod +x configure_sudo.sh
    sudo ./configure_sudo.sh [-u <username>]
+   ```
