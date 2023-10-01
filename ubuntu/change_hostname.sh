@@ -6,14 +6,8 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-# Define the new hostname (customize this)
-new_hostname="localhost"
-
-# Check if a new hostname is provided
-if [ -z "$new_hostname" ]; then
-  echo "Please specify the new hostname by editing this script."
-  exit 1
-fi
+# Check if the new hostname is specified as an argument; use "localhost" as the default
+new_hostname="${1:-localhost}"
 
 # Change the hostname using hostnamectl
 hostnamectl set-hostname "$new_hostname"

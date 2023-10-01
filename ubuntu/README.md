@@ -29,4 +29,4 @@ This Bash script allows you to change the hostname of a Linux machine. It uses t
 
    ```bash
    chmod +x change_hostname.sh
-   sudo ./change_hostname.sh
+   sudo ./change_hostname.sh new_hostname
