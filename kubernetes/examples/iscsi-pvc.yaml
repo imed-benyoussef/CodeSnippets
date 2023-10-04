@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: iscsi-claim
+spec:
+  accessModes:
+    - ReadWriteOnce  # Mode d'accès au volume
+  resources:
+    requests:
+      storage: 1Gi  # Taille du volume iSCSI
+  storageClassName: synology-iscsi-storage  # Nom de la classe de stockage iSCSI

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3  # Nombre de répliques NGINX
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest  # Utilisez l'image NGINX de votre choix
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: iscsi-volume  # Nom du volume iSCSI
+              mountPath: /var/www/html  # Chemin de montage du volume
+
+      volumes:
+        - name: iscsi-volume
+          persistentVolumeClaim:
+            claimName: iscsi-claim  # Nom de la demande de volume persistant iSCSI
