@@ -11,19 +11,17 @@ namespace Aiglusoft.IAM.Infrastructure.Services
     public class JwksService : IJwksService
     {
         private readonly ICertificateService _certificateService;
-        private readonly IConfiguration _configuration;
 
-        public JwksService(ICertificateService certificateService, IConfiguration configuration)
+        public JwksService(ICertificateService certificateService)
         {
             _certificateService = certificateService;
-            _configuration = configuration;
         }
 
         public JsonWebKeySet GetJsonWebKeySet()
         {
             var rsa = _certificateService.GetRsaPublicKey();
             var parameters = rsa.ExportParameters(false);
-            var keyId = _configuration["Oidc:KeyId"];
+            var keyId = _certificateService.GetKeyId();
 
             var jwk = new JsonWebKey
             {

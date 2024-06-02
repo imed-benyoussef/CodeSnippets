@@ -7,6 +7,7 @@ namespace Aiglusoft.IAM.Tests.Services
     using Aiglusoft.IAM.Infrastructure.Services;
     using System.Security.Cryptography.X509Certificates;
     using Microsoft.AspNetCore.Hosting;
+    using System.Security.Cryptography;
 
     public class CertificateServiceTests
     {
@@ -32,6 +33,27 @@ namespace Aiglusoft.IAM.Tests.Services
         }
 
         [Fact]
+        public void GetRsaPrivateKey_ShouldReturnPrivateKey()
+        {
+            // Arrange
+            var configurationMock = new Mock<IConfiguration>();
+            configurationMock.Setup(c => c["Oidc:CertificatePath"]).Returns("certs/certificate.pfx");
+            configurationMock.Setup(c => c["Oidc:CertificatePassword"]).Returns("");
+
+            var environmentMock = new Mock<IWebHostEnvironment>();
+            environmentMock.Setup(e => e.ContentRootPath).Returns(Directory.GetCurrentDirectory());
+
+            var service = new CertificateService(configurationMock.Object);
+
+            // Act
+            var result = service.GetRsaPrivateKey();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<RSA>(result);
+        }
+
+        [Fact]
         public void GetKeyId_ShouldReturnKeyId()
         {
             // Arrange
@@ -49,7 +71,29 @@ namespace Aiglusoft.IAM.Tests.Services
 
             // Assert
             Assert.NotNull(result);
-            Assert.NotEmpty(result);
+            Assert.IsAssignableFrom<RSA>(result);
+        }
+
+
+        [Fact]
+        public void GetRsaPublicKey_ShouldReturnPublicKey()
+        {
+            // Arrange
+            var configurationMock = new Mock<IConfiguration>();
+            configurationMock.Setup(c => c["Oidc:CertificatePath"]).Returns("certs/certificate.pfx");
+            configurationMock.Setup(c => c["Oidc:CertificatePassword"]).Returns("");
+
+            var environmentMock = new Mock<IWebHostEnvironment>();
+            environmentMock.Setup(e => e.ContentRootPath).Returns(Directory.GetCurrentDirectory());
+
+            var service = new CertificateService(configurationMock.Object);
+
+            // Act
+            var result = service.GetRsaPublicKey();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<RSA>(result);
         }
     }
 }
