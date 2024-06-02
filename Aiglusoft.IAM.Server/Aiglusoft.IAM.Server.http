@@ -1,0 +1,6 @@
+@Aiglusoft.IAM.Server_HostAddress = http://localhost:5193
+
+GET {{Aiglusoft.IAM.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
