@@ -18,4 +18,5 @@ namespace Aiglusoft.IAM.Application.Commands
             Password = password;
         }
     }
+
 }

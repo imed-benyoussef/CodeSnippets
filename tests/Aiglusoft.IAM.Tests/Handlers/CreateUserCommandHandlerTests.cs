@@ -1,5 +1,5 @@
 ﻿using Aiglusoft.IAM.Application.Commands;
-using Aiglusoft.IAM.Application.Handlers;
+using Aiglusoft.IAM.Application.Commands.Handlers;
 using Aiglusoft.IAM.Domain.Entities;
 using Aiglusoft.IAM.Domain.Repositories;
 using Moq;
@@ -24,8 +24,6 @@ namespace Aiglusoft.IAM.Tests.Handlers
             userRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<User>()), Times.Once);
         }
     }
-
-
 
 
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Aiglusoft.IAM.E2ETests.ControllerTests
 {
@@ -17,14 +18,19 @@ namespace Aiglusoft.IAM.E2ETests.ControllerTests
             // Arrange
             var command = new { Username = "testuser", Password = "password" };
             var content = CreateJsonContent(command);
-
+            var client = Factory.CreateClient();
             // Act
-            var response = await Client.PostAsync("/api/users", content);
+            var response = await client.PostAsync("/api/users", content);
 
             // Assert
             response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
             Assert.False(string.IsNullOrEmpty(responseString));
+        }
+
+        protected override void ConfigureTestServices(IServiceCollection services)
+        {
+           
         }
     }
 

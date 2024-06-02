@@ -1,10 +1,14 @@
+using Aiglusoft.IAM.Application;
+using Aiglusoft.IAM.Application.Behaviors;
 using Aiglusoft.IAM.Application.Commands;
 using Aiglusoft.IAM.Domain.Repositories;
 using Aiglusoft.IAM.Infrastructure.Repositories;
 using Aiglusoft.IAM.Infrastructure.Services;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
@@ -42,11 +46,16 @@ namespace Aiglusoft.IAM.Server
                 builder.Services.AddEndpointsApiExplorer();
                 builder.Services.AddSwaggerGen();
 
+                builder.Services.AddValidatorsFromAssembly(typeof(Application.ApplicationLayer).Assembly);
+
                 // Register MediatR
-                builder.Services.AddMediatR(typeof(CreateUserCommand).Assembly);
+                builder.Services.AddMediatR(typeof(ApplicationLayer).Assembly);
+                builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
                 builder.Services.AddScoped<IUserRepository, UserRepository>();
-                builder.Services.AddScoped<IUserRepository, UserRepository>();
-                builder.Services.AddSingleton<JwtTokenService>();
+                builder.Services.AddScoped<IAuthorizationCodeRepository, AuthorizationCodeRepository>();
+
+                builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
                 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Secret"]);
 
@@ -85,6 +94,8 @@ namespace Aiglusoft.IAM.Server
                 }
 
                 app.UseHttpsRedirection();
+
+                app.UseRouting();
 
                 app.UseAuthentication();
                 app.UseAuthorization();

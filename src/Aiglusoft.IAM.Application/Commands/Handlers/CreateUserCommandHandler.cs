@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Aiglusoft.IAM.Application.Commands;
 using Aiglusoft.IAM.Domain.Repositories;
 
-namespace Aiglusoft.IAM.Application.Handlers
+namespace Aiglusoft.IAM.Application.Commands.Handlers
 {
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Guid>
     {

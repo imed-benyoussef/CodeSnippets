@@ -7,7 +7,8 @@ using System.Text;
 
 namespace Aiglusoft.IAM.Infrastructure.Services
 {
-    public class JwtTokenService
+
+    public class JwtTokenService : IJwtTokenService
     {
         private readonly string _issuer;
         private readonly string _audience;
