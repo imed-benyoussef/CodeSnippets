@@ -3,7 +3,9 @@ using Aiglusoft.IAM.Application.Commands.GenerateAuthorizationCode;
 using Aiglusoft.IAM.Infrastructure.Services;
 using Aiglusoft.IAM.Server.Extensions;
 using MediatR;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 
 namespace Aiglusoft.IAM.Server.Controllers
 {
@@ -63,9 +65,6 @@ namespace Aiglusoft.IAM.Server.Controllers
                 return BadRequest("Invalid authorization code");
             }
         }
-
-
-
     }
 
 }

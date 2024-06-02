@@ -1,7 +1,9 @@
 using Aiglusoft.IAM.Application;
 using Aiglusoft.IAM.Application.Behaviors;
 using Aiglusoft.IAM.Application.Commands;
+using Aiglusoft.IAM.Domain;
 using Aiglusoft.IAM.Domain.Repositories;
+using Aiglusoft.IAM.Domain.Services;
 using Aiglusoft.IAM.Infrastructure.Repositories;
 using Aiglusoft.IAM.Infrastructure.Services;
 using FluentValidation;
@@ -20,7 +22,7 @@ using System.Text;
 
 namespace Aiglusoft.IAM.Server
 {
-    public class Program
+    public partial class Program
     {
         public static void Main(string[] args)
         {
@@ -55,17 +57,27 @@ namespace Aiglusoft.IAM.Server
                 builder.Services.AddScoped<IUserRepository, UserRepository>();
                 builder.Services.AddScoped<IAuthorizationCodeRepository, AuthorizationCodeRepository>();
 
-                builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
-                var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Secret"]);
+                builder.Services.AddSingleton<ICertificateService, CertificateService>();
+                builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();       
+                builder.Services.AddScoped<IDiscoveryService, DiscoveryService>();
+                builder.Services.AddScoped<IJwksService, JwksService>();         
 
-                builder.Services.AddAuthentication(options =>
+                  builder.Services.AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 })
                 .AddJwtBearer(options =>
                 {
+                    var serviceProvider = builder.Services.BuildServiceProvider();
+                    var certificateService = serviceProvider.GetRequiredService<ICertificateService>();
+                    var rsa = certificateService.GetRsaPrivateKey();
+                    var key = new RsaSecurityKey(rsa)
+                    {
+                        KeyId = certificateService.GetKeyId()
+                    };
+
                     options.RequireHttpsMetadata = false;
                     options.SaveToken = true;
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -76,7 +88,7 @@ namespace Aiglusoft.IAM.Server
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = builder.Configuration["Jwt:Issuer"],
                         ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(key)
+                        IssuerSigningKey = key
                     };
                 });
 
