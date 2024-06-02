@@ -23,4 +23,5 @@ namespace Aiglusoft.IAM.Server.Controllers
             return Ok(new { message = "Logging is configured!" });
         }
     }
+
 }

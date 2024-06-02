@@ -1,8 +1,18 @@
+using Aiglusoft.IAM.Application.Commands;
+using Aiglusoft.IAM.Domain.Repositories;
+using Aiglusoft.IAM.Infrastructure.Repositories;
+using Aiglusoft.IAM.Infrastructure.Services;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System;
+using System.Reflection;
+using System.Text;
+
 
 namespace Aiglusoft.IAM.Server
 {
@@ -32,6 +42,36 @@ namespace Aiglusoft.IAM.Server
                 builder.Services.AddEndpointsApiExplorer();
                 builder.Services.AddSwaggerGen();
 
+                // Register MediatR
+                builder.Services.AddMediatR(typeof(CreateUserCommand).Assembly);
+                builder.Services.AddScoped<IUserRepository, UserRepository>();
+                builder.Services.AddScoped<IUserRepository, UserRepository>();
+                builder.Services.AddSingleton<JwtTokenService>();
+
+                var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Secret"]);
+
+                builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(key)
+                    };
+                });
+
+
                 var app = builder.Build();
 
                 app.UseDefaultFiles();
@@ -46,6 +86,7 @@ namespace Aiglusoft.IAM.Server
 
                 app.UseHttpsRedirection();
 
+                app.UseAuthentication();
                 app.UseAuthorization();
 
                 app.MapControllers();

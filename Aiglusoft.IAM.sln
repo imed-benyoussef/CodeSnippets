@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aiglusoft.IAM.Tests", "tests\Aiglusoft.IAM.Tests\Aiglusoft.IAM.Tests.csproj", "{5D65C4A7-017E-4D5F-BB5F-A8C4D73104BB}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A7C14D47-ACF7-454C-86DA-8F9B664BBD4F}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "aiglusoft.iam.client", "src\aiglusoft.iam.client\aiglusoft.iam.client.esproj", "{17B22661-5365-43FA-8279-693829904920}"
@@ -13,16 +11,22 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aiglusoft.IAM.Server", "src
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5F2F541B-F40F-4DE6-B0BC-038F812ECA7C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aiglusoft.IAM.E2ETests", "tests\Aiglusoft.IAM.E2ETests\Aiglusoft.IAM.E2ETests.csproj", "{F5C14E7C-203A-4AB6-8495-307246B65523}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aiglusoft.IAM.Domain", "src\Aiglusoft.IAM.Domain\Aiglusoft.IAM.Domain.csproj", "{2DDEC150-B93D-44D1-8580-08ACEBC608D8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aiglusoft.IAM.Tests", "tests\Aiglusoft.IAM.Tests\Aiglusoft.IAM.Tests.csproj", "{8173E22D-CF5A-4E13-96DC-20E379B99EE4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aiglusoft.IAM.Application", "src\Aiglusoft.IAM.Application\Aiglusoft.IAM.Application.csproj", "{B96C3186-A2AE-4F35-929C-B7E8A71F9593}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aiglusoft.IAM.Infrastructure", "src\Aiglusoft.IAM.Infrastructure\Aiglusoft.IAM.Infrastructure.csproj", "{3901EDEE-C4D2-41B7-8046-82A3C0EBB9C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5D65C4A7-017E-4D5F-BB5F-A8C4D73104BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5D65C4A7-017E-4D5F-BB5F-A8C4D73104BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5D65C4A7-017E-4D5F-BB5F-A8C4D73104BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5D65C4A7-017E-4D5F-BB5F-A8C4D73104BB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{17B22661-5365-43FA-8279-693829904920}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{17B22661-5365-43FA-8279-693829904920}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17B22661-5365-43FA-8279-693829904920}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
@@ -33,14 +37,38 @@ Global
 		{CB2D8BD8-CD51-4A34-A836-D38CA7A5C162}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CB2D8BD8-CD51-4A34-A836-D38CA7A5C162}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CB2D8BD8-CD51-4A34-A836-D38CA7A5C162}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5C14E7C-203A-4AB6-8495-307246B65523}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5C14E7C-203A-4AB6-8495-307246B65523}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5C14E7C-203A-4AB6-8495-307246B65523}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5C14E7C-203A-4AB6-8495-307246B65523}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DDEC150-B93D-44D1-8580-08ACEBC608D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DDEC150-B93D-44D1-8580-08ACEBC608D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DDEC150-B93D-44D1-8580-08ACEBC608D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DDEC150-B93D-44D1-8580-08ACEBC608D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8173E22D-CF5A-4E13-96DC-20E379B99EE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8173E22D-CF5A-4E13-96DC-20E379B99EE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8173E22D-CF5A-4E13-96DC-20E379B99EE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8173E22D-CF5A-4E13-96DC-20E379B99EE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B96C3186-A2AE-4F35-929C-B7E8A71F9593}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B96C3186-A2AE-4F35-929C-B7E8A71F9593}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B96C3186-A2AE-4F35-929C-B7E8A71F9593}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B96C3186-A2AE-4F35-929C-B7E8A71F9593}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3901EDEE-C4D2-41B7-8046-82A3C0EBB9C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3901EDEE-C4D2-41B7-8046-82A3C0EBB9C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3901EDEE-C4D2-41B7-8046-82A3C0EBB9C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3901EDEE-C4D2-41B7-8046-82A3C0EBB9C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{5D65C4A7-017E-4D5F-BB5F-A8C4D73104BB} = {5F2F541B-F40F-4DE6-B0BC-038F812ECA7C}
 		{17B22661-5365-43FA-8279-693829904920} = {A7C14D47-ACF7-454C-86DA-8F9B664BBD4F}
 		{CB2D8BD8-CD51-4A34-A836-D38CA7A5C162} = {A7C14D47-ACF7-454C-86DA-8F9B664BBD4F}
+		{F5C14E7C-203A-4AB6-8495-307246B65523} = {5F2F541B-F40F-4DE6-B0BC-038F812ECA7C}
+		{2DDEC150-B93D-44D1-8580-08ACEBC608D8} = {A7C14D47-ACF7-454C-86DA-8F9B664BBD4F}
+		{8173E22D-CF5A-4E13-96DC-20E379B99EE4} = {5F2F541B-F40F-4DE6-B0BC-038F812ECA7C}
+		{B96C3186-A2AE-4F35-929C-B7E8A71F9593} = {A7C14D47-ACF7-454C-86DA-8F9B664BBD4F}
+		{3901EDEE-C4D2-41B7-8046-82A3C0EBB9C8} = {A7C14D47-ACF7-454C-86DA-8F9B664BBD4F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {509BB128-80BA-4B88-A82F-710CC814554B}
