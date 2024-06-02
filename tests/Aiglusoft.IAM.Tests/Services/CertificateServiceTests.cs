@@ -71,7 +71,7 @@ namespace Aiglusoft.IAM.Tests.Services
 
             // Assert
             Assert.NotNull(result);
-            Assert.IsAssignableFrom<RSA>(result);
+            Assert.NotEmpty(result);
         }
 
 

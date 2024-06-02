@@ -12,6 +12,22 @@ using Aiglusoft.IAM.Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Headers;
 using System;
+using System.Web;
+using AutoFixture.Xunit2;
+using System.Net;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using Xunit;
+using Aiglusoft.IAM.Infrastructure.Repositories;
+using AutoFixture;
+using AutoFixture.Xunit2;
+using System.Web;
 
 namespace Aiglusoft.IAM.E2ETests.ControllerTests
 {
@@ -28,23 +44,24 @@ namespace Aiglusoft.IAM.E2ETests.ControllerTests
         protected override void ConfigureTestServices(IServiceCollection services)
         {
             services.AddSingleton(_authorizationCodeRepositoryMock.Object);
+
         }
 
-        [Fact]
-        public async Task Authorize_ShouldRedirectWithAuthorizationCode()
+        [Theory, AutoData]
+        public async Task Authorize_ShouldRedirectWithAuthorizationCode(string client_id, string state)
         {
             // Arrange
-            var client_id = "test_client_id";
             var redirect_uri = "http://localhost";
-            var state = "xyz";
-            var url = $"/connect/authorize?response_type=code&client_id={client_id}&redirect_uri={System.Web.HttpUtility.UrlEncode(redirect_uri)}&state={state}";
-            var client = Factory.CreateClient();
+            var url = $"/connect/authorize?response_type=code&client_id={client_id}&redirect_uri={HttpUtility.UrlEncode(redirect_uri)}&state={state}";
+
+            var client = Factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false});
+
             // Act
             var response = await client.GetAsync(url);
 
             // Assert
-            //response.EnsureSuccessStatusCode();
             var redirectUri = response.Headers.Location;
+            Assert.NotNull(redirectUri);
             Assert.Contains("code=", redirectUri.Query);
             Assert.Contains($"state={state}", redirectUri.Query);
         }
@@ -91,4 +108,6 @@ namespace Aiglusoft.IAM.E2ETests.ControllerTests
             public int ExpiresIn { get; set; }
         }
     }
+
+
 }
