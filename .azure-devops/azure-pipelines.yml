@@ -34,7 +34,7 @@ jobs:
 
   - script: |
       cd src/aiglusoft.iam.client
-      ng build --prod --output-path=../Aiglusoft.IAM.Server/wwwroot
+      ng build -c production --output-path=../Aiglusoft.IAM.Server/wwwroot
     displayName: 'Build Angular Project and Copy to wwwroot'
 
   - task: UseDotNet@2
