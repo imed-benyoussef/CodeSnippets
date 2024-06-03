@@ -1,5 +1,8 @@
 trigger:
-- develop
+  branches:
+    include:
+      - develop
+      - feature/*
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -11,33 +14,58 @@ variables:
 
 jobs:
 - job: Build
-  displayName: 'Build and Test'
+  displayName: 'Build Angular and .NET Projects'
 
   steps:
+  - task: NodeTool@0
+    displayName: 'Install Node.js 22.x'
+    inputs:
+      versionSpec: '22.x'
+      checkLatest: true
+
+  - script: |
+      npm install -g @angular/cli@17
+    displayName: 'Install Angular CLI 17'
+
+  - script: |
+      cd src/aiglusoft.iam.client
+      npm install
+    displayName: 'Install Angular Dependencies'
+
+  - script: |
+      cd src/aiglusoft.iam.client
+      ng build --prod --output-path=../Aiglusoft.IAM.Server/wwwroot
+    displayName: 'Build Angular Project and Copy to wwwroot'
+
   - task: UseDotNet@2
+    displayName: 'Install .NET SDK 8.x'
     inputs:
       packageType: 'sdk'
       version: '8.x'
       installationPath: $(Agent.ToolsDirectory)/dotnet
 
   - task: DotNetCoreCLI@2
+    displayName: 'Restore NuGet Packages'
     inputs:
       command: 'restore'
       projects: '$(solution)'
 
   - task: DotNetCoreCLI@2
+    displayName: 'Build Solution'
     inputs:
       command: 'build'
       projects: '$(solution)'
       arguments: '--configuration $(buildConfiguration)'
 
   - task: DotNetCoreCLI@2
+    displayName: 'Run Unit Tests'
     inputs:
       command: 'test'
       projects: '$(solution)'
       arguments: '--configuration $(buildConfiguration) --logger trx --results-directory $(Build.SourcesDirectory)/TestResults'
 
   - task: PublishTestResults@2
+    displayName: 'Publish Test Results'
     inputs:
       testResultsFiles: '$(Build.SourcesDirectory)/TestResults/*.trx'
       mergeTestResults: true
@@ -46,13 +74,15 @@ jobs:
       configuration: '$(buildConfiguration)'
 
   - task: DotNetCoreCLI@2
+    displayName: 'Publish Web Projects'
     inputs:
       command: 'publish'
       publishWebProjects: true
       arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
   - task: PublishBuildArtifacts@1
+    displayName: 'Publish .NET Build Artifacts'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'drop'
+      artifactName: 'dotnet-app'
       publishLocation: 'Container'
