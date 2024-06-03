@@ -1,8 +1,27 @@
 trigger:
   branches:
     include:
-      - develop
-      - feature/*
+    - master
+    - develop
+    - feature/*
+    - bugfix/*
+    - release/*
+    - hotfix/*
+  paths:
+    include:
+    - 'apps/*'
+    - 'libs/*'
+    exclude:
+    - '.azuredevops/*'
+
+pr:
+  branches:
+    include:
+    - master
+    - develop
+  paths:
+    exclude:
+    - '.azuredevops/*'
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -12,122 +31,154 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
-jobs:
-- job: Build
-  displayName: 'Build Angular and .NET Projects'
+  stages:
+    - stage: CalculateVersionStage
+      displayName: 'Calculate Version'
+      jobs:
+        - job: CalculateVersion
+          displayName: 'Calculate version number using GitVersion'
+          steps:
+            - checkout: self
+              fetchDepth: 0
+              clean: true
+  
+            - task: UseDotNet@2
+              displayName: 'Use .Net 8.0'
+              inputs:
+                packageType: 'sdk'
+                version: '8.x'
+  
+            - task: gitversion/setup@0
+              displayName: 'Install GitVersion'
+              inputs:
+                versionSpec: '5.x'
+  
+            - task: gitversion/execute@0
+              displayName: 'Use GitVersion'
+              name: Version # the step MUST be named to access its output variables in another stage.
+  
+            - script: |
+                echo "##vso[task.setvariable variable=NuGetVersion]$(Version.NuGetVersion)"
+              displayName: 'Set NuGetVersion variable'
+           
+        - stage: Build
+          displayName: 'Build Angular and .NET Projects'
+          jobs:
+          - job: Build
+            displayName: 'Build Angular and .NET Projects'
 
-  steps:
-  - task: NodeTool@0
-    displayName: 'Install Node.js 22.x'
-    inputs:
-      versionSpec: '22.x'
-      checkLatest: true
+            steps:
+            - task: NodeTool@0
+              displayName: 'Install Node.js 22.x'
+              inputs:
+                versionSpec: '22.x'
+                checkLatest: true
 
-  - script: |
-      npm install -g @angular/cli@17
-    displayName: 'Install Angular CLI 17'
+            - script: |
+                npm install -g @angular/cli@17
+              displayName: 'Install Angular CLI 17'
 
-  - script: |
-      cd src/aiglusoft.iam.client
-      npm install
-    displayName: 'Install Angular Dependencies'
+            - script: |
+                cd src/aiglusoft.iam.client
+                npm install
+              displayName: 'Install Angular Dependencies'
 
-  - script: |
-      cd src/aiglusoft.iam.client
-      ng build --output-path=../Aiglusoft.IAM.Server/wwwroot
-    displayName: 'Build Angular Project and Copy to wwwroot'
+            - script: |
+                cd src/aiglusoft.iam.client
+                ng build --output-path=../Aiglusoft.IAM.Server/wwwroot
+              displayName: 'Build Angular Project and Copy to wwwroot'
 
-  - script: |
-      cd src/aiglusoft.iam.client
-      ng test --watch=false --browsers=ChromeHeadless --code-coverage
-    displayName: 'Run Angular Unit Tests and Generate Coverage'
+            - script: |
+                cd src/aiglusoft.iam.client
+                ng test --watch=false --browsers=ChromeHeadless --code-coverage
+              displayName: 'Run Angular Unit Tests and Generate Coverage'
 
-  # - task: PublishCodeCoverageResults@1
-  #   displayName: 'Publish Angular Code Coverage Results'
-  #   inputs:
-  #     codeCoverageTool: 'Cobertura'
-  #     summaryFileLocation: 'src/aiglusoft.iam.client/coverage/coverage-summary.json'
-  #     reportDirectory: 'src/aiglusoft.iam.client/coverage'
-  #     failIfCoverageEmpty: true
+            # - task: PublishCodeCoverageResults@1
+            #   displayName: 'Publish Angular Code Coverage Results'
+            #   inputs:
+            #     codeCoverageTool: 'Cobertura'
+            #     summaryFileLocation: 'src/aiglusoft.iam.client/coverage/coverage-summary.json'
+            #     reportDirectory: 'src/aiglusoft.iam.client/coverage'
+            #     failIfCoverageEmpty: true
 
-  - task: UseDotNet@2
-    displayName: 'Install .NET SDK 8.x'
-    inputs:
-      packageType: 'sdk'
-      version: '8.x'
-      installationPath: $(Agent.ToolsDirectory)/dotnet
+            - task: UseDotNet@2
+              displayName: 'Install .NET SDK 8.x'
+              inputs:
+                packageType: 'sdk'
+                version: '8.x'
+                installationPath: $(Agent.ToolsDirectory)/dotnet
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Restore NuGet Packages'
-    inputs:
-      command: 'restore'
-      projects: '$(solution)'
+            - task: DotNetCoreCLI@2
+              displayName: 'Restore NuGet Packages'
+              inputs:
+                command: 'restore'
+                projects: '$(solution)'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Build Solution'
-    inputs:
-      command: 'build'
-      projects: '$(solution)'
-      arguments: '--configuration $(buildConfiguration)'
+            - task: DotNetCoreCLI@2
+              displayName: 'Build Solution'
+              inputs:
+                command: 'build'
+                projects: '$(solution)'
+                arguments: '--configuration $(buildConfiguration)'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Run Unit Tests with Coverage'
-    inputs:
-      command: 'test'
-      projects: 'tests/Aiglusoft.IAM.Tests/Aiglusoft.IAM.Tests.csproj'
-      arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/UnitTests/coverage.xml'
-    
-  - task: DotNetCoreCLI@2
-    displayName: 'Run E2E Tests'
-    inputs:
-      command: 'test'
-      projects: 'tests/Aiglusoft.IAM.E2ETests/Aiglusoft.IAM.E2ETests.csproj'
-      arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/E2ETests/coverage.xml'
+            - task: DotNetCoreCLI@2
+              displayName: 'Run Unit Tests with Coverage'
+              inputs:
+                command: 'test'
+                projects: 'tests/Aiglusoft.IAM.Tests/Aiglusoft.IAM.Tests.csproj'
+                arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/UnitTests/coverage.xml'
+              
+            - task: DotNetCoreCLI@2
+              displayName: 'Run E2E Tests'
+              inputs:
+                command: 'test'
+                projects: 'tests/Aiglusoft.IAM.E2ETests/Aiglusoft.IAM.E2ETests.csproj'
+                arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/E2ETests/coverage.xml'
 
-  - task: PublishTestResults@2
-    displayName: 'Publish Unit Test Results'
-    inputs:
-      testResultsFiles: '$(Build.SourcesDirectory)/TestResults/UnitTests/*.trx'
-      mergeTestResults: true
-      testRunTitle: 'Unit Test Results'
-      platform: '$(buildPlatform)'
-      configuration: '$(buildConfiguration)'
+            - task: PublishTestResults@2
+              displayName: 'Publish Unit Test Results'
+              inputs:
+                testResultsFiles: '$(Build.SourcesDirectory)/TestResults/UnitTests/*.trx'
+                mergeTestResults: true
+                testRunTitle: 'Unit Test Results'
+                platform: '$(buildPlatform)'
+                configuration: '$(buildConfiguration)'
 
-  - task: PublishTestResults@2
-    displayName: 'Publish E2E Test Results'
-    inputs:
-      testResultsFiles: '$(Build.SourcesDirectory)/TestResults/E2ETests/*.trx'
-      mergeTestResults: true
-      testRunTitle: 'E2E Test Results'
-      platform: '$(buildPlatform)'
-      configuration: '$(buildConfiguration)'
+            - task: PublishTestResults@2
+              displayName: 'Publish E2E Test Results'
+              inputs:
+                testResultsFiles: '$(Build.SourcesDirectory)/TestResults/E2ETests/*.trx'
+                mergeTestResults: true
+                testRunTitle: 'E2E Test Results'
+                platform: '$(buildPlatform)'
+                configuration: '$(buildConfiguration)'
 
-  # - task: PublishCodeCoverageResults@1
-  #   displayName: 'Publish .NET Unit Test Code Coverage Results'
-  #   inputs:
-  #     codeCoverageTool: 'Cobertura'
-  #     summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/UnitTests/coverage.xml'
-  #     reportDirectory: '$(Build.SourcesDirectory)/TestResults/UnitTests'
-  #     failIfCoverageEmpty: true
+            # - task: PublishCodeCoverageResults@1
+            #   displayName: 'Publish .NET Unit Test Code Coverage Results'
+            #   inputs:
+            #     codeCoverageTool: 'Cobertura'
+            #     summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/UnitTests/coverage.xml'
+            #     reportDirectory: '$(Build.SourcesDirectory)/TestResults/UnitTests'
+            #     failIfCoverageEmpty: true
 
-  # - task: PublishCodeCoverageResults@1
-  #   displayName: 'Publish .NET E2E Test Code Coverage Results'
-  #   inputs:
-  #     codeCoverageTool: 'Cobertura'
-  #     summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/E2ETests/coverage.xml'
-  #     reportDirectory: '$(Build.SourcesDirectory)/TestResults/E2ETests'
-  #     failIfCoverageEmpty: true
+            # - task: PublishCodeCoverageResults@1
+            #   displayName: 'Publish .NET E2E Test Code Coverage Results'
+            #   inputs:
+            #     codeCoverageTool: 'Cobertura'
+            #     summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/E2ETests/coverage.xml'
+            #     reportDirectory: '$(Build.SourcesDirectory)/TestResults/E2ETests'
+            #     failIfCoverageEmpty: true
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Publish Web Projects'
-    inputs:
-      command: 'publish'
-      publishWebProjects: true
-      arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+            - task: DotNetCoreCLI@2
+              displayName: 'Publish Web Projects'
+              inputs:
+                command: 'publish'
+                publishWebProjects: true
+                arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish .NET Build Artifacts'
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'dotnet-app'
-      publishLocation: 'Container'
+            - task: PublishBuildArtifacts@1
+              displayName: 'Publish .NET Build Artifacts'
+              inputs:
+                pathToPublish: '$(Build.ArtifactStagingDirectory)'
+                artifactName: 'dotnet-app'
+                publishLocation: 'Container'
