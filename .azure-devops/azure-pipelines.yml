@@ -42,13 +42,13 @@ jobs:
       ng test --watch=false --browsers=ChromeHeadless --code-coverage
     displayName: 'Run Angular Unit Tests and Generate Coverage'
 
-  - task: PublishCodeCoverageResults@1
-    displayName: 'Publish Angular Code Coverage Results'
-    inputs:
-      codeCoverageTool: 'Cobertura'
-      summaryFileLocation: 'src/aiglusoft.iam.client/coverage/coverage-summary.json'
-      reportDirectory: 'src/aiglusoft.iam.client/coverage'
-      failIfCoverageEmpty: true
+  # - task: PublishCodeCoverageResults@1
+  #   displayName: 'Publish Angular Code Coverage Results'
+  #   inputs:
+  #     codeCoverageTool: 'Cobertura'
+  #     summaryFileLocation: 'src/aiglusoft.iam.client/coverage/coverage-summary.json'
+  #     reportDirectory: 'src/aiglusoft.iam.client/coverage'
+  #     failIfCoverageEmpty: true
 
   - task: UseDotNet@2
     displayName: 'Install .NET SDK 8.x'
