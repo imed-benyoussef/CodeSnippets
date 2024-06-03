@@ -29,7 +29,9 @@ namespace Aiglusoft.IAM.Server.Controllers
         [HttpGet("~/connect/authorize")]
         public async Task<IActionResult> GetAuthorize(CancellationToken cancellationToken = default)
         {
-            var request = HttpContext.Request.Query.ToAuthorizeRequest();
+            var request = HttpContext.GetOAuthServerRequest();
+
+            //var request = HttpContext.Request.Query.ToAuthorizeRequest();
 
             if (request.ResponseType != "code")
             {
@@ -52,7 +54,9 @@ namespace Aiglusoft.IAM.Server.Controllers
         [HttpPost("~/connect/token")]
         public async Task<IActionResult> PostToken(CancellationToken cancellationToken = default)
         {
-            var request = HttpContext.Request.Form.ToTokenRequest();
+            var request = HttpContext.GetOAuthServerRequest();
+
+            //var request = HttpContext.Request.Form.ToTokenRequest();
 
             var command = new ExchangeAuthorizationCodeCommand(request.Code, request.ClientId, request.ClientSecret, request.RedirectUri, request.GrantType);
             try
