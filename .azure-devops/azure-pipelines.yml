@@ -9,8 +9,8 @@ trigger:
     - hotfix/*
   paths:
     include:
-    - 'apps/*'
-    - 'libs/*'
+    - 'src/*'
+    - 'tests/*'
     exclude:
     - '.azuredevops/*'
 
@@ -31,132 +31,132 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
-  stages:
-    - stage: CalculateVersionStage
-      displayName: 'Calculate Version'
-      jobs:
-        - job: CalculateVersion
-          displayName: 'Calculate version number using GitVersion'
-          steps:
-            - checkout: self
-              fetchDepth: 0
-              clean: true
-  
-            - task: UseDotNet@2
-              displayName: 'Use .Net 8.0'
-              inputs:
-                packageType: 'sdk'
-                version: '8.x'
-  
-            - task: gitversion/setup@0
-              displayName: 'Install GitVersion'
-              inputs:
-                versionSpec: '5.x'
-  
-            - task: gitversion/execute@0
-              displayName: 'Use GitVersion'
-              name: Version # the step MUST be named to access its output variables in another stage.
-  
-            - script: |
-                echo "##vso[task.setvariable variable=NuGetVersion]$(Version.NuGetVersion)"
-              displayName: 'Set NuGetVersion variable'
-           
-        - stage: Build
-          displayName: 'Build Angular and .NET Projects'
-          jobs:
-          - job: Build
-            displayName: 'Build Angular and .NET Projects'
+stages:
+  - stage: CalculateVersionStage
+    displayName: 'Calculate Version'
+    jobs:
+      - job: CalculateVersion
+        displayName: 'Calculate version number using GitVersion'
+        steps:
+          - checkout: self
+            fetchDepth: 0
+            clean: true
 
-            steps:
-            - task: NodeTool@0
-              displayName: 'Install Node.js 22.x'
-              inputs:
-                versionSpec: '22.x'
-                checkLatest: true
+          - task: UseDotNet@2
+            displayName: 'Use .Net 8.0'
+            inputs:
+              packageType: 'sdk'
+              version: '8.x'
 
-            - script: |
-                npm install -g @angular/cli@17
-              displayName: 'Install Angular CLI 17'
+          - task: gitversion/setup@0
+            displayName: 'Install GitVersion'
+            inputs:
+              versionSpec: '5.x'
 
-            - script: |
-                cd src/aiglusoft.iam.client
-                npm install
-              displayName: 'Install Angular Dependencies'
+          - task: gitversion/execute@0
+            displayName: 'Use GitVersion'
+            name: Version # the step MUST be named to access its output variables in another stage.
 
-            - script: |
-                cd src/aiglusoft.iam.client
-                ng build --output-path=../Aiglusoft.IAM.Server/wwwroot
-              displayName: 'Build Angular Project and Copy to wwwroot'
+          - script: |
+              echo "##vso[task.setvariable variable=NuGetVersion]$(Version.NuGetVersion)"
+            displayName: 'Set NuGetVersion variable'
+          
+  - stage: Build
+    displayName: 'Build Angular and .NET Projects'
+    jobs:
+    - job: Build
+      displayName: 'Build Angular and .NET Projects'
 
-            - script: |
-                cd src/aiglusoft.iam.client
-                ng test --watch=false --browsers=ChromeHeadless --code-coverage
-              displayName: 'Run Angular Unit Tests and Generate Coverage'
+      steps:
+      - task: NodeTool@0
+        displayName: 'Install Node.js 22.x'
+        inputs:
+          versionSpec: '22.x'
+          checkLatest: true
 
-            # - task: PublishCodeCoverageResults@1
-            #   displayName: 'Publish Angular Code Coverage Results'
-            #   inputs:
-            #     codeCoverageTool: 'Cobertura'
-            #     summaryFileLocation: 'src/aiglusoft.iam.client/coverage/coverage-summary.json'
-            #     reportDirectory: 'src/aiglusoft.iam.client/coverage'
-            #     failIfCoverageEmpty: true
+      - script: |
+          npm install -g @angular/cli@17
+        displayName: 'Install Angular CLI 17'
 
-            - task: UseDotNet@2
-              displayName: 'Install .NET SDK 8.x'
-              inputs:
-                packageType: 'sdk'
-                version: '8.x'
-                installationPath: $(Agent.ToolsDirectory)/dotnet
+      - script: |
+          cd src/aiglusoft.iam.client
+          npm install
+        displayName: 'Install Angular Dependencies'
 
-            - task: DotNetCoreCLI@2
-              displayName: 'Restore NuGet Packages'
-              inputs:
-                command: 'restore'
-                projects: '$(solution)'
+      - script: |
+          cd src/aiglusoft.iam.client
+          ng build --output-path=../Aiglusoft.IAM.Server/wwwroot
+        displayName: 'Build Angular Project and Copy to wwwroot'
 
-            - task: DotNetCoreCLI@2
-              displayName: 'Build Solution'
-              inputs:
-                command: 'build'
-                projects: '$(solution)'
-                arguments: '--configuration $(buildConfiguration)'
+      - script: |
+          cd src/aiglusoft.iam.client
+          ng test --watch=false --browsers=ChromeHeadless --code-coverage
+        displayName: 'Run Angular Unit Tests and Generate Coverage'
 
-            - task: DotNetCoreCLI@2
-              displayName: 'Run Unit Tests with Coverage'
-              inputs:
-                command: 'test'
-                projects: 'tests/Aiglusoft.IAM.Tests/Aiglusoft.IAM.Tests.csproj'
-                arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/UnitTests/coverage.xml'
-              
-            - task: DotNetCoreCLI@2
-              inputs:
-                command: 'test'
-                projects: '**/*.csproj'
-                arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.ArtifactStagingDirectory)/'
+      # - task: PublishCodeCoverageResults@1
+      #   displayName: 'Publish Angular Code Coverage Results'
+      #   inputs:
+      #     codeCoverageTool: 'Cobertura'
+      #     summaryFileLocation: 'src/aiglusoft.iam.client/coverage/coverage-summary.json'
+      #     reportDirectory: 'src/aiglusoft.iam.client/coverage'
+      #     failIfCoverageEmpty: true
 
-            - task: PublishBuildArtifacts@1
-              inputs:
-                pathToPublish: '$(Build.ArtifactStagingDirectory)'
-                artifactName: 'coverage'
-                publishLocation: 'Container'
+      - task: UseDotNet@2
+        displayName: 'Install .NET SDK 8.x'
+        inputs:
+          packageType: 'sdk'
+          version: '8.x'
+          installationPath: $(Agent.ToolsDirectory)/dotnet
 
-            - task: PublishCodeCoverageResults@1
-              inputs:
-                codeCoverageTool: 'Cobertura'
-                summaryFileLocation: '$(Build.ArtifactStagingDirectory)/**/coverage.cobertura.xml'
-                reportDirectory: '$(Build.ArtifactStagingDirectory)'
-                failIfCoverageEmpty: true
+      - task: DotNetCoreCLI@2
+        displayName: 'Restore NuGet Packages'
+        inputs:
+          command: 'restore'
+          projects: '$(solution)'
 
-            - task: DotNetCoreCLI@2
-              displayName: 'Publish Web Projects'
-              inputs:
-                command: 'publish'
-                publishWebProjects: true
-                arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+      - task: DotNetCoreCLI@2
+        displayName: 'Build Solution'
+        inputs:
+          command: 'build'
+          projects: '$(solution)'
+          arguments: '--configuration $(buildConfiguration)'
 
-            - task: PublishBuildArtifacts@1
-              displayName: 'Publish .NET Build Artifacts'
-              inputs:
-                pathToPublish: '$(Build.ArtifactStagingDirectory)'
-                artifactName: 'dotnet-app'
-                publishLocation: 'Container'
+      - task: DotNetCoreCLI@2
+        displayName: 'Run Unit Tests with Coverage'
+        inputs:
+          command: 'test'
+          projects: 'tests/Aiglusoft.IAM.Tests/Aiglusoft.IAM.Tests.csproj'
+          arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/UnitTests/coverage.xml'
+        
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: '**/*.csproj'
+          arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.ArtifactStagingDirectory)/'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: 'coverage'
+          publishLocation: 'Container'
+
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: '$(Build.ArtifactStagingDirectory)/**/coverage.cobertura.xml'
+          reportDirectory: '$(Build.ArtifactStagingDirectory)'
+          failIfCoverageEmpty: true
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Publish Web Projects'
+        inputs:
+          command: 'publish'
+          publishWebProjects: true
+          arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish .NET Build Artifacts'
+        inputs:
+          pathToPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: 'dotnet-app'
+          publishLocation: 'Container'
