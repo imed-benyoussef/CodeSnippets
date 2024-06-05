@@ -20,54 +20,45 @@ namespace Aiglusoft.IAM.Server.Controllers
             _sender = mediator;
         }
 
-        /// <summary>
-        /// Action pour l'endpoint /connect/authorize.
-        /// Gère la demande d'autorisation OAuth 2.0.
-        /// </summary>
-        /// <param name="cancellationToken">Le jeton d'annulation facultatif.</param>
-        /// <returns>Une action de redirection vers l'URL de redirection.</returns>
-        [HttpGet("~/connect/authorize")]
-        public async Task<IActionResult> GetAuthorize(CancellationToken cancellationToken = default)
-        {
-            var request = HttpContext.GetOAuthServerRequest();
+        ///// <summary>
+        ///// Action pour l'endpoint /connect/authorize.
+        ///// Gère la demande d'autorisation OAuth 2.0.
+        ///// </summary>
+        ///// <param name="cancellationToken">Le jeton d'annulation facultatif.</param>
+        ///// <returns>Une action de redirection vers l'URL de redirection.</returns>
+        //[HttpGet("~/connect/authorize")]
+        //public async Task<IActionResult> GetAuthorize(CancellationToken cancellationToken = default)
+        //{
+        //    var request = HttpContext.GetOidcServerRequest();
 
-            //var request = HttpContext.Request.Query.ToAuthorizeRequest();
+        //    if (request.IsAuthorizationCodeRequest())
+        //    {
+        //        var command = new GenerateAuthorizationCodeCommand(request.ClientId, request.RedirectUri, request.State);
+        //        var authorizationCode = await _sender.Send(command, cancellationToken);
 
-            if (request.ResponseType != "code")
-            {
-                return BadRequest("Invalid response_type");
-            }
+        //        var uriBuilder = new UriBuilder(request.RedirectUri);
+        //        var query = System.Web.HttpUtility.ParseQueryString(uriBuilder.Query);
+        //        query["code"] = authorizationCode;
+        //        query["state"] = request.State;
+        //        uriBuilder.Query = query.ToString();
+        //        var redirectUrl = uriBuilder.ToString();
 
-            var command = new GenerateAuthorizationCodeCommand(request.ClientId, request.RedirectUri, request.State);
-            var authorizationCode = await _sender.Send(command, cancellationToken);
+        //        return Redirect(redirectUrl);
+        //    }
 
-            var uriBuilder = new UriBuilder(request.RedirectUri);
-            var query = System.Web.HttpUtility.ParseQueryString(uriBuilder.Query);
-            query["code"] = authorizationCode;
-            query["state"] = request.State;
-            uriBuilder.Query = query.ToString();
-            var redirectUrl = uriBuilder.ToString();
+        //    throw new NotImplementedException("Le type de flux spécifié n'est pas implémenté.");
 
-            return Redirect(redirectUrl);
-        }
+        //}
 
         [HttpPost("~/connect/token")]
         public async Task<IActionResult> PostToken(CancellationToken cancellationToken = default)
         {
-            var request = HttpContext.GetOAuthServerRequest();
-
-            //var request = HttpContext.Request.Form.ToTokenRequest();
+            var request = HttpContext.GetOidcServerRequest();
 
             var command = new ExchangeAuthorizationCodeCommand(request.Code, request.ClientId, request.ClientSecret, request.RedirectUri, request.GrantType);
-            try
-            {
-                var tokenResponse = await _sender.Send(command, cancellationToken);
-                return Ok(tokenResponse);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return BadRequest("Invalid authorization code");
-            }
+
+            var tokenResponse = await _sender.Send(command, cancellationToken);
+            return Ok(tokenResponse);
         }
     }
 

@@ -1,13 +1,16 @@
-﻿using Aiglusoft.IAM.Server.Models;
+﻿using Aiglusoft.IAM.Application.Exceptions;
+using Aiglusoft.IAM.Server.Models;
+using Azure.Core;
+using MediatR;
 
 namespace Aiglusoft.IAM.Server.Extensions
 {
     public static class HttpContextExtensions
     {
-        public static OAuthServerRequest GetOAuthServerRequest(this HttpContext context)
+        public static OidcServerRequest GetOidcServerRequest(this HttpContext context)
         {
-            var request = new OAuthServerRequest();
-            var properties = typeof(OAuthServerRequest).GetProperties();
+            var request = new OidcServerRequest();
+            var properties = typeof(OidcServerRequest).GetProperties();
 
             foreach (var property in properties)
             {
@@ -18,6 +21,67 @@ namespace Aiglusoft.IAM.Server.Extensions
 
             return request;
         }
+
+        
+        public static bool IsAuthorizationCodeRequest(this OidcServerRequest request)
+        {
+            // Check required parameters for Authorization Code request
+            if (string.IsNullOrEmpty(request.ResponseType) || request.ResponseType != "code")
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(request.ClientId))
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(request.RedirectUri))
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(request.Scope))
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(request.State))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public static void ThrowIfNotValidAuthorizationCodeRequest(this OidcServerRequest request)
+        {
+            if (string.IsNullOrEmpty(request.ResponseType) || request.ResponseType != "code")
+            {
+                throw new OAuthException("invalid_request", "The response_type must be 'code'.");
+            }
+
+            if (string.IsNullOrEmpty(request.ClientId))
+            {
+                throw new OAuthException("invalid_request", "The client_id is missing.");
+            }
+
+            if (string.IsNullOrEmpty(request.RedirectUri))
+            {
+                throw new OAuthException("invalid_request", "The redirect_uri is missing.");
+            }
+
+            if (string.IsNullOrEmpty(request.Scope))
+            {
+                throw new OAuthException("invalid_request", "The scope is missing.");
+            }
+
+            if (string.IsNullOrEmpty(request.State))
+            {
+                throw new OAuthException("invalid_request", "The state is missing.");
+            }
+        }
+
 
         private static string GetRequestValue(this HttpRequest request, string key)
         {
@@ -41,18 +105,19 @@ namespace Aiglusoft.IAM.Server.Extensions
 
         static string MapPropertyName(string key) => key switch
         {
-           "Code"              =>  "code"                   ,
-           "ClientId"           => "client_id"               ,
-           "ClientSecret"       => "client_secret"           ,
-           "RedirectUri"        => "redirect_uri"            ,
-           "GrantType"          => "grant_type"              ,
-
-           "ResponseType"       => "response_type"           ,
-           "CodeChallenge"      => "code_challenge"          ,
-           "CodeChallengeMethod"=> "code_challenge_method"   ,
-           "State"              => "state"                   ,
-           "Nonce"              => "nonce"                   ,
-           "Scope"              => "scope"                   ,
+            nameof(OidcServerRequest.Code) => "code",
+            nameof(OidcServerRequest.ClientId) => "client_id",
+            nameof(OidcServerRequest.ClientSecret) => "client_secret",
+            nameof(OidcServerRequest.RedirectUri) => "redirect_uri",
+            nameof(OidcServerRequest.GrantType) => "grant_type",
+            nameof(OidcServerRequest.ResponseType) => "response_type",
+            nameof(OidcServerRequest.CodeChallenge) => "code_challenge",
+            nameof(OidcServerRequest.CodeChallengeMethod) => "code_challenge_method",
+            nameof(OidcServerRequest.State) => "state",
+            nameof(OidcServerRequest.Nonce) => "nonce",
+            nameof(OidcServerRequest.Scope) => "scope",
+            _ => throw new ArgumentException($"Unknown property: {key}")
         };
+
     }
 }

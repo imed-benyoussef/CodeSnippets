@@ -42,9 +42,6 @@
 		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="Middleware\" />
-	</ItemGroup>
-	<ItemGroup>
 		<ProjectReference Include="..\Aiglusoft.IAM.Application\Aiglusoft.IAM.Application.csproj" />
 		<ProjectReference Include="..\Aiglusoft.IAM.Infrastructure\Aiglusoft.IAM.Infrastructure.csproj" />
 	</ItemGroup>

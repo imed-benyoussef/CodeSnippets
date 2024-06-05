@@ -28,6 +28,10 @@ using Aiglusoft.IAM.Infrastructure.Repositories;
 using AutoFixture;
 using AutoFixture.Xunit2;
 using System.Web;
+using FluentAssertions;
+using Aiglusoft.IAM.Application.Commands.GenerateAuthorizationCode;
+using Aiglusoft.IAM.Application.Exceptions;
+using MediatR;
 
 namespace Aiglusoft.IAM.E2ETests.ControllerTests
 {
@@ -48,22 +52,78 @@ namespace Aiglusoft.IAM.E2ETests.ControllerTests
         }
 
         [Theory, AutoData]
-        public async Task Authorize_ShouldRedirectWithAuthorizationCode(string client_id, string state)
+        public async Task AuthorizeOAuth2_ShouldRedirectWithAuthorizationCode(string client_id, string state, string scope)
         {
             // Arrange
             var redirect_uri = "http://localhost";
-            var url = $"/connect/authorize?response_type=code&client_id={client_id}&redirect_uri={HttpUtility.UrlEncode(redirect_uri)}&state={state}";
+            var url = $"/connect/authorize?response_type=code&client_id={client_id}&redirect_uri={HttpUtility.UrlEncode(redirect_uri)}&scope={scope}&state={state}";
 
-            var client = Factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false});
+            var client = Factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
 
             // Act
             var response = await client.GetAsync(url);
 
             // Assert
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.Redirect);
+
             var redirectUri = response.Headers.Location;
-            Assert.NotNull(redirectUri);
-            Assert.Contains("code=", redirectUri.Query);
-            Assert.Contains($"state={state}", redirectUri.Query);
+            redirectUri.Should().NotBeNull();
+            redirectUri.Query.Should().Contain("code=");
+            redirectUri.Query.Should().Contain($"state={state}");
+        }
+
+        [Theory, AutoData]
+        public async Task AuthorizeOidc_ShouldRedirectWithIdToken(string client_id, string state, string scope)
+        {
+            // Arrange
+            var redirect_uri = "http://localhost:8888";
+            var response_type = "id_token";
+            var nonce = "random_nonce";
+            var url = $"/connect/authorize?response_type={response_type}&client_id={client_id}&redirect_uri={HttpUtility.UrlEncode(redirect_uri)}&scope={scope}&state={state}&nonce={nonce}";
+
+            var client = Factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+            // Act
+            var response = await client.GetAsync(url);
+
+            // Assert
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.Redirect);
+
+            var redirectUri = response.Headers.Location;
+            redirectUri.Should().NotBeNull();
+            redirectUri.Query.Should().Contain("id_token=");
+            redirectUri.Query.Should().Contain($"state={state}");
+            redirectUri.Query.Should().Contain($"nonce={nonce}");
+        }
+
+        [Theory, AutoData]
+        public async Task AuthorizeOAuth2_ShouldRedirectWithError_WhenOAuthExceptionIsThrown(string client_id, string state, string scope)
+        {
+            // Arrange
+            var redirect_uri = "http://localhost:8888";
+            var url = $"/connect/authorize?response_type=code&client_id={client_id}&redirect_uri={HttpUtility.UrlEncode(redirect_uri)}&scope={scope}&state={state}";
+
+            var mockSender = new Mock<ISender>();
+            mockSender.Setup(sender => sender.Send(It.IsAny<GenerateAuthorizationCodeCommand>(), It.IsAny<CancellationToken>()))
+                      .ThrowsAsync(new OAuthException("invalid_request", "Invalid request parameters."));
+
+            var client = Factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(services =>
+                {
+                    services.AddSingleton(mockSender.Object);
+                });
+            }).CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+            // Act
+            var response = await client.GetAsync(url);
+
+            // Assert
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.Redirect);
+            var redirectUri = response.Headers.Location;
+            redirectUri.Should().NotBeNull();
+            redirectUri.Query.Should().Contain("error=invalid_request");
+            redirectUri.Query.Should().Contain($"state={state}");
         }
 
         [Fact]

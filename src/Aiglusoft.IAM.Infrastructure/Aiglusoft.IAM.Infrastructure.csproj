@@ -17,5 +17,9 @@
     <ProjectReference Include="..\Aiglusoft.IAM.Application\Aiglusoft.IAM.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
+  </ItemGroup>
+
 
 </Project>

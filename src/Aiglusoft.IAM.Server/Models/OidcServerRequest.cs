@@ -1,6 +1,6 @@
 ﻿namespace Aiglusoft.IAM.Server.Models
 {
-    public class OAuthServerRequest
+    public class OidcServerRequest
     {
         // Properties for AuthorizeRequest
         public string ResponseType { get; set; }

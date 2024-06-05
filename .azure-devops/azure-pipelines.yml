@@ -129,45 +129,23 @@ variables:
                 arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/UnitTests/coverage.xml'
               
             - task: DotNetCoreCLI@2
-              displayName: 'Run E2E Tests'
               inputs:
                 command: 'test'
-                projects: 'tests/Aiglusoft.IAM.E2ETests/Aiglusoft.IAM.E2ETests.csproj'
-                arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/E2ETests/coverage.xml'
+                projects: '**/*.csproj'
+                arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.ArtifactStagingDirectory)/'
 
-            - task: PublishTestResults@2
-              displayName: 'Publish Unit Test Results'
+            - task: PublishBuildArtifacts@1
               inputs:
-                testResultsFiles: '$(Build.SourcesDirectory)/TestResults/UnitTests/*.trx'
-                mergeTestResults: true
-                testRunTitle: 'Unit Test Results'
-                platform: '$(buildPlatform)'
-                configuration: '$(buildConfiguration)'
+                pathToPublish: '$(Build.ArtifactStagingDirectory)'
+                artifactName: 'coverage'
+                publishLocation: 'Container'
 
-            - task: PublishTestResults@2
-              displayName: 'Publish E2E Test Results'
+            - task: PublishCodeCoverageResults@1
               inputs:
-                testResultsFiles: '$(Build.SourcesDirectory)/TestResults/E2ETests/*.trx'
-                mergeTestResults: true
-                testRunTitle: 'E2E Test Results'
-                platform: '$(buildPlatform)'
-                configuration: '$(buildConfiguration)'
-
-            # - task: PublishCodeCoverageResults@1
-            #   displayName: 'Publish .NET Unit Test Code Coverage Results'
-            #   inputs:
-            #     codeCoverageTool: 'Cobertura'
-            #     summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/UnitTests/coverage.xml'
-            #     reportDirectory: '$(Build.SourcesDirectory)/TestResults/UnitTests'
-            #     failIfCoverageEmpty: true
-
-            # - task: PublishCodeCoverageResults@1
-            #   displayName: 'Publish .NET E2E Test Code Coverage Results'
-            #   inputs:
-            #     codeCoverageTool: 'Cobertura'
-            #     summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/E2ETests/coverage.xml'
-            #     reportDirectory: '$(Build.SourcesDirectory)/TestResults/E2ETests'
-            #     failIfCoverageEmpty: true
+                codeCoverageTool: 'Cobertura'
+                summaryFileLocation: '$(Build.ArtifactStagingDirectory)/**/coverage.cobertura.xml'
+                reportDirectory: '$(Build.ArtifactStagingDirectory)'
+                failIfCoverageEmpty: true
 
             - task: DotNetCoreCLI@2
               displayName: 'Publish Web Projects'

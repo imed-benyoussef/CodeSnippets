@@ -8,7 +8,7 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
     {
         private static readonly ConcurrentDictionary<string, AuthorizationCode> Store = new ConcurrentDictionary<string, AuthorizationCode>();
 
-        public Task SaveAsync(AuthorizationCode authorizationCode)
+        public Task SaveAsync(AuthorizationCode authorizationCode, CancellationToken cancellationToken)
         {
             Store[authorizationCode.Code] = authorizationCode;
             return Task.CompletedTask;
