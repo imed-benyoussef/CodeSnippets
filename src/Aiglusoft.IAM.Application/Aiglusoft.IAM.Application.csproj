@@ -14,10 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Validators\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Aiglusoft.IAM.Domain\Aiglusoft.IAM.Domain.csproj" />
   </ItemGroup>
 

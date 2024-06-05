@@ -90,7 +90,7 @@ namespace Aiglusoft.IAM.Server
 
             // Ajouter MediatR pour le traitement des commandes et des requêtes
             services.AddMediatR(typeof(ApplicationLayer).Assembly);
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
             // Ajouter les dépendances pour les repositories et services
             services.AddScoped<IUserRepository, UserRepository>();

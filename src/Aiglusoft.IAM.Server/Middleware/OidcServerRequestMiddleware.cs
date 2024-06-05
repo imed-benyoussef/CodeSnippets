@@ -8,6 +8,7 @@
     using Aiglusoft.IAM.Application.Commands.GenerateAuthorizationCode;
     using Aiglusoft.IAM.Server.Extensions;
     using Aiglusoft.IAM.Application.Exceptions;
+    using FluentValidation;
 
     public class OidcServerRequestMiddleware
     {
@@ -27,7 +28,7 @@
             if (context.Request.Path.Equals("/connect/authorize", StringComparison.OrdinalIgnoreCase))
             {
                 var request = context.GetOidcServerRequest();
-
+                string redirectUri="";
                 try
                 {
 
@@ -42,9 +43,7 @@
                      codeChallengeMethod:  request.CodeChallengeMethod
                    );
 
-                    var redirectUri = await sender.Send(command, cancellationToken);
-
-                    context.Response.Redirect(redirectUri);
+                    redirectUri = await sender.Send(command, cancellationToken);                   
 
                 }
                 catch (OAuthException ex)
@@ -60,8 +59,10 @@
                     }
 
                     uriBuilder.Query = query.ToString();
-                    context.Response.Redirect(uriBuilder.ToString());
+                    redirectUri = uriBuilder.ToString();
                 }
+                
+                context.Response.Redirect(redirectUri);
             }
             else
             {
