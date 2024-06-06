@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RecoverPasswordComponent } from './recover-password.component';
+import { SharedModule } from '../../../../shared/shared.module';
 
 describe('RecoverPasswordComponent', () => {
   let component: RecoverPasswordComponent;

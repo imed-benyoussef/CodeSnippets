@@ -24,10 +24,10 @@ import { SharedModule } from './shared/shared.module';
 
   ],
   imports: [
-    BrowserModule, HttpClientModule,
+    BrowserModule, 
+    HttpClientModule,
     AppRoutingModule,
-    SharedModule,
-    AuthModule
+    SharedModule
   ],
   providers: [],
   bootstrap: [AppComponent]

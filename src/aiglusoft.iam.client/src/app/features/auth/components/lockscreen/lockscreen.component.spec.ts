@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LockscreenComponent } from './lockscreen.component';
+import { SharedModule } from '../../../../shared/shared.module';
 
 describe('LockscreenComponent', () => {
   let component: LockscreenComponent;
