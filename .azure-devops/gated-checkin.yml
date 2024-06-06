@@ -1,0 +1,32 @@
+trigger: no
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  coberturaOutputFormat: '/p:CoverletOutputFormat=cobertura'
+  coverageDirectory: '$(Build.ArtifactStagingDirectory)/coverage/'
+
+stages:
+  - stage: GatedCheckIn
+    displayName: 'Gated Check-in Validation'
+    jobs:
+      - job: Validate
+        displayName: 'Validate Changes'
+        steps:
+          - checkout: self
+            fetchDepth: 0
+            clean: true
+
+          # Use templates for reusability and consistency
+          - template: templates/angular-steps.yml
+
+          - template: templates/dotnet-steps.yml
+            parameters:
+              solution: ${{ variables.solution }}
+              buildConfiguration: ${{ variables.buildConfiguration }}
+              coberturaOutputFormat: ${{ variables.coberturaOutputFormat }}
+              coverageDirectory: ${{ variables.coverageDirectory }}

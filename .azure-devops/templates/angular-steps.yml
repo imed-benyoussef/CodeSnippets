@@ -1,0 +1,35 @@
+steps:
+  - task: NodeTool@0
+    displayName: 'Install Node.js 22.x'
+    inputs:
+      versionSpec: '22.x'
+      checkLatest: true
+
+  - script: |
+      npm install -g @angular/cli@17
+    displayName: 'Install Angular CLI 17'
+
+  - script: |
+      cd src/aiglusoft.iam.client
+      npm install
+    displayName: 'Install Angular Dependencies'
+
+
+  - script: |
+      cd src/aiglusoft.iam.client
+      ng test --watch=false --browsers=ChromeHeadless --code-coverage
+    displayName: 'Run Angular Unit Tests and Generate Coverage'
+
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish Angular Code Coverage Results'
+    inputs:
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: 'coverage-summary.json'
+      reportDirectory: 'coverage/aiglusoft.iam.client/'
+      failIfCoverageEmpty: true
+    continueOnError: true
+
+  - script: |
+      cd src/aiglusoft.iam.client
+      ng build --output-path=src/aiglusoft.iam.client/dist
+    displayName: 'Build Angular Project and Copy to dist'
