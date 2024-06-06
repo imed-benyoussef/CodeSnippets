@@ -28,16 +28,15 @@ import { AuthLayoutComponent } from '../../layouts/auth-layout/auth-layout.compo
     LayoutsModule,
     SharedModule,
     RouterModule.forChild([
-      {
-        path: '', component: AuthLayoutComponent, children: [
-          { path: 'signin', component: SigninComponent },
-          { path: 'signup', component: SignupComponent },
-          { path: 'forgot-password', component: ForgotPasswordComponent },
-          { path: 'email-verification', component: EmailVerificationComponent },
-          { path: 'lockscreen', component: LockscreenComponent },
-          { path: 'recover-password', component: RecoverPasswordComponent }
-        ]
-      }])
+
+      { path: 'signin', component: SigninComponent },
+      { path: 'signup', component: SignupComponent },
+      { path: 'forgot-password', component: ForgotPasswordComponent },
+      { path: 'email-verification', component: EmailVerificationComponent },
+      { path: 'lockscreen', component: LockscreenComponent },
+      { path: 'recover-password', component: RecoverPasswordComponent },
+      { path: '', redirectTo: 'signin', pathMatch: 'full' },
+    ])
   ]
 })
 export class AuthModule { }
