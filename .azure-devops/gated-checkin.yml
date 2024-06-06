@@ -1,4 +1,4 @@
-trigger: no
+trigger: none
 
 pool:
   vmImage: 'ubuntu-latest'
