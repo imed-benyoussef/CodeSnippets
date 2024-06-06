@@ -20,14 +20,14 @@ steps:
       ng test --watch=false --browsers=ChromeHeadless --code-coverage
     displayName: 'Run Angular Unit Tests and Generate Coverage'
 
-  - task: PublishCodeCoverageResults@1
-    displayName: 'Publish Angular Code Coverage Results'
-    inputs:
-      codeCoverageTool: 'Cobertura'
-      summaryFileLocation: 'coverage-summary.json'
-      reportDirectory: 'coverage/aiglusoft.iam.client/'
-      failIfCoverageEmpty: true
-    continueOnError: true
+  # - task: PublishCodeCoverageResults@1
+  #   displayName: 'Publish Angular Code Coverage Results'
+  #   inputs:
+  #     codeCoverageTool: 'Cobertura'
+  #     summaryFileLocation: 'src/aiglusoft.iam.client/coverage/aiglusoft.iam.client/coverage-summary.json'
+  #     reportDirectory: 'src/aiglusoft.iam.client/coverage/aiglusoft.iam.client'
+  #     failIfCoverageEmpty: true
+  #   continueOnError: true
 
   - script: |
       cd src/aiglusoft.iam.client
