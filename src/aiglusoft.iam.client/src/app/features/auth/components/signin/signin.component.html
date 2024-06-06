@@ -1,37 +1,51 @@
 <div class="mb-3 pb-3 text-center">
-    <h4 class="fw-normal">Welcome to <span class="fw-bold">Heyauth</span></h4>
-    <p class="text-muted mb-0">Sign in to continue to Heyauth.</p>
+    <h4 class="fw-normal">
+        {{ 'features.auth.components.signin.WELCOME_TO' | translate }}
+        <span class="fw-bold">{{ 'features.auth.components.signin.APPNAME' | translate }}</span>
+    </h4>
+    <p class="text-muted mb-0">
+        {{ 'features.auth.components.signin.SIGN_IN_TO_CONTINUE' | translate }}
+    </p>
 </div>
 <form class="form-custom mt-3">
     <div class="mb-3">
-        <label class="form-label" for="username">Username</label>
-        <input type="text" class="form-control" id="username" placeholder="Enter username">
+        <label class="form-label" for="username">{{ 'features.auth.components.signin.USERNAME' | translate }}</label>
+        <input type="text" class="form-control" id="username" placeholder="{{ 'features.auth.components.signin.ENTER_USERNAME' | translate }}">
     </div>
     <div class="form-password mb-3 auth-pass-inputgroup">
-        <label class="form-label" for="userpassword">Password</label>
+        <label class="form-label" for="userpassword">{{ 'features.auth.components.signin.PASSWORD' | translate }}</label>
         <div class="position-relative">
-            <input type="password" class="form-control" id="password-input" placeholder="Enter password">
+            <input type="password" class="form-control" id="password-input" placeholder="{{ 'features.auth.components.signin.ENTER_PASSWORD' | translate }}">
             <button type="button" class="btn btn-link position-absolute h-100 end-0 top-0 shadow-none" appTogglePasswordVisibility>
-            <i class="mdi mdi-eye-outline f-16 text-muted"></i>
-          </button>
+                <i class="mdi mdi-eye-outline f-16 text-muted"></i>
+            </button>
         </div>
     </div>
     <div class="row mb-3">
         <div class="col-sm-6">
             <div class="form-checkbox">
                 <input type="checkbox" class="form-check-input me-1 shadow-none" id="customControlInline">
-                <label class="form-label text-muted f-15 fw-medium" for="customControlInline">Remember me</label>
+                <label class="form-label text-muted f-15 fw-medium" for="customControlInline">{{ 'features.auth.components.signin.REMEMBER_ME' | translate }}</label>
             </div>
         </div>
         <div class="col-sm-6 text-end">
-            <a routerLink="/recover-password" class="text-muted f-15 fw-medium"><i class="mdi mdi-lock"></i> Forgot your password?</a>
+            <a routerLink="/recover-password" class="text-muted f-15 fw-medium">
+                <i class="mdi mdi-lock"></i> {{ 'features.auth.components.signin.FORGOT_PASSWORD' | translate }}
+            </a>
         </div>
     </div>
     <div class="text-center mt-3">
-        <button class="btn btn-success shadow-none w-50 rounded-pill" type="submit">Log In</button>
+        <button class="btn btn-success shadow-none w-50 rounded-pill" type="submit">
+            {{ 'features.auth.components.signin.LOG_IN' | translate }}
+        </button>
     </div>
     <hr>
     <div class="mt-3 text-center">
-        <p class="mb-0 text-muted">Don't have an account? <a routerLink="/signup" class="text-success fw-bold text-decoration-underline ms-1">Sign up</a></p>
+        <p class="mb-0 text-muted">
+            {{ 'features.auth.components.signin.DONT_HAVE_ACCOUNT' | translate }}
+            <a routerLink="/signup" class="text-success fw-bold text-decoration-underline ms-1">
+                {{ 'features.auth.components.signin.SIGN_UP' | translate }}
+            </a>
+        </p>
     </div>
 </form>

@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SigninComponent } from './signin.component';
 import { SharedModule } from '../../../../shared/shared.module';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('SigninComponent', () => {
   let component: SigninComponent;
@@ -10,7 +11,7 @@ describe('SigninComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [SigninComponent],
-      imports:[SharedModule]
+      imports:[SharedModule, TranslateModule.forRoot()]
     })
     .compileComponents();
     

@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -16,6 +16,14 @@ import { RecoverPasswordComponent } from './features/auth/components/recover-pas
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { AuthModule } from './features/auth/auth.module';
 import { SharedModule } from './shared/shared.module';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+
+
+// AoT requires an exported function for factories
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http);
+}
 
 @NgModule({
   declarations: [
@@ -27,7 +35,15 @@ import { SharedModule } from './shared/shared.module';
     BrowserModule, 
     HttpClientModule,
     AppRoutingModule,
-    SharedModule
+    SharedModule,
+    TranslateModule.forRoot({
+      defaultLanguage: 'fr',
+      loader: {
+          provide: TranslateLoader,
+          useFactory: HttpLoaderFactory,
+          deps: [HttpClient]
+      }
+  })
   ],
   providers: [],
   bootstrap: [AppComponent]

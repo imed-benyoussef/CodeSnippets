@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LockscreenComponent } from './lockscreen.component';
 import { SharedModule } from '../../../../shared/shared.module';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('LockscreenComponent', () => {
   let component: LockscreenComponent;
@@ -9,7 +10,8 @@ describe('LockscreenComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [LockscreenComponent]
+      declarations: [LockscreenComponent],
+      imports:[SharedModule, TranslateModule.forRoot()]
     })
     .compileComponents();
     
