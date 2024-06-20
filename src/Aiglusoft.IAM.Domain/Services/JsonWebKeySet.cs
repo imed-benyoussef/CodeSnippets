@@ -19,5 +19,4 @@ namespace Aiglusoft.IAM.Domain
         public string E { get; set; }
         public string N { get; set; }
     }
-
 }

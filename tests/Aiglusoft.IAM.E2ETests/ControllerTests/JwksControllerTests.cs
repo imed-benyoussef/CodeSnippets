@@ -1,24 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Xunit;
 using Aiglusoft.IAM.Server;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-
 
 namespace Aiglusoft.IAM.E2ETests.ControllerTests
 {
-    public class JwksControllerTests : BaseIntegrationTest
+    public class JwksControllerTests : IClassFixture<AiglusoftWebApplicationFactory>
     {
-        public JwksControllerTests(WebApplicationFactory<Program> factory) : base(factory)
+        private readonly HttpClient _client;
+
+        public JwksControllerTests(AiglusoftWebApplicationFactory factory)
         {
+            _client = factory.CreateClient(new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = true,
+                BaseAddress = new Uri("https://localhost")
+            });
         }
 
         [Fact]
         public async Task Get_ShouldReturnJwks()
         {
-            // Arrange
-            var client = Factory.CreateClient();
-
             // Act
-            var response = await client.GetAsync("/.well-known/jwks.json");
+            var response = await _client.GetAsync(".well-known/jwks.json");
 
             // Assert
             response.EnsureSuccessStatusCode();
@@ -30,11 +37,5 @@ namespace Aiglusoft.IAM.E2ETests.ControllerTests
             Assert.Contains("n", responseString);
             Assert.Contains("e", responseString);
         }
-
-        protected override void ConfigureTestServices(IServiceCollection services)
-        {
-            
-        }
     }
-
 }

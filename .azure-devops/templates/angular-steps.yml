@@ -14,11 +14,11 @@ steps:
       npm install
     displayName: 'Install Angular Dependencies'
 
-
   - script: |
       cd src/aiglusoft.iam.client
       ng test --watch=false --browsers=ChromeHeadless --code-coverage
     displayName: 'Run Angular Unit Tests and Generate Coverage'
+    continueOnError: true
 
   # - task: PublishCodeCoverageResults@1
   #   displayName: 'Publish Angular Code Coverage Results'

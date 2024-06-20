@@ -7,10 +7,8 @@ import { RecoverPasswordComponent } from './components/recover-password/recover-
 import { SigninComponent } from './components/signin/signin.component';
 import { SignupComponent } from './components/signup/signup.component';
 import { SharedModule } from '../../shared/shared.module';
-import { LayoutsModule } from '../../layouts/layouts.module';
-import { AuthCarouselComponent } from '../../shared/components/auth-carousel/auth-carousel.component';
 import { RouterModule } from '@angular/router';
-import { AuthLayoutComponent } from '../../layouts/auth-layout/auth-layout.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 
 
 
@@ -22,10 +20,10 @@ import { AuthLayoutComponent } from '../../layouts/auth-layout/auth-layout.compo
     ForgotPasswordComponent,
     LockscreenComponent,
     RecoverPasswordComponent,
+    ResetPasswordComponent,
   ],
   imports: [
     CommonModule,
-    LayoutsModule,
     SharedModule,
     RouterModule.forChild([
 
@@ -35,6 +33,7 @@ import { AuthLayoutComponent } from '../../layouts/auth-layout/auth-layout.compo
       { path: 'email-verification', component: EmailVerificationComponent },
       { path: 'lockscreen', component: LockscreenComponent },
       { path: 'recover-password', component: RecoverPasswordComponent },
+      { path: 'reset-password', component: ResetPasswordComponent },
       { path: '', redirectTo: 'signin', pathMatch: 'full' },
     ])
   ]

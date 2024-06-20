@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -21,20 +22,56 @@ namespace Aiglusoft.IAM.Infrastructure.Services
             _secret = configuration["Jwt:Secret"];
         }
 
-        public string GenerateToken(string username)
+        public string GenerateAccessToken(IEnumerable<Claim> claims, DateTime expiry)
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _issuer,
+                audience: _audience,
+                claims: claims,
+                expires: expiry,
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string GenerateIdToken(IEnumerable<Claim> claims, DateTime expiry)
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _issuer,
+                audience: _audience,
+                claims: claims,
+                expires: expiry,
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public ClaimsPrincipal ValidateToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
+
+            return tokenHandler.ValidateToken(token, GetValidationParameters(), out SecurityToken validatedToken);
+
+        }
+        public TokenValidationParameters GetValidationParameters()
+        {
+            return new TokenValidationParameters
             {
-                Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }),
-                Expires = DateTime.UtcNow.AddHours(1),
-                Issuer = _issuer,
-                Audience = _audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                ValidateIssuer = true,
+                ValidIssuer = _issuer,
+                ValidateAudience = true,
+                ValidAudience = _audience,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret)),
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
         }
     }
 }

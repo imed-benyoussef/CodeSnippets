@@ -16,5 +16,11 @@
         public string Code { get; set; }
         public string ClientSecret { get; set; }
         public string GrantType { get; set; }
+        public string Prompt { get; internal set; }
+        public string MaxAge { get; internal set; }
+        public string Display { get; internal set; }
+        public string AcrValues { get; internal set; }
+        public string IdTokenHint { get; internal set; }
+        public string LoginHint { get; internal set; }
     }
 }

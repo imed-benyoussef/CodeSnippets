@@ -37,4 +37,5 @@ namespace Aiglusoft.IAM.Tests.Services
             Assert.Equal(Base64UrlEncoder.Encode(parameters.Modulus), key.N);
         }
     }
+
 }

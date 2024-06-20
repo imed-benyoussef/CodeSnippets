@@ -13,17 +13,14 @@ import { EmailVerificationComponent } from './features/auth/components/email-ver
 import { ForgotPasswordComponent } from './features/auth/components/forgot-password/forgot-password.component';
 import { LockscreenComponent } from './features/auth/components/lockscreen/lockscreen.component';
 import { RecoverPasswordComponent } from './features/auth/components/recover-password/recover-password.component';
-import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
+import { AuthLayoutComponent } from './core/layouts/auth-layout/auth-layout.component';
 import { AuthModule } from './features/auth/auth.module';
 import { SharedModule } from './shared/shared.module';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { CoreModule } from './core/core.module';
 
 
-// AoT requires an exported function for factories
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http);
-}
 
 @NgModule({
   declarations: [
@@ -35,15 +32,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     BrowserModule, 
     HttpClientModule,
     AppRoutingModule,
-    SharedModule,
-    TranslateModule.forRoot({
-      defaultLanguage: 'fr',
-      loader: {
-          provide: TranslateLoader,
-          useFactory: HttpLoaderFactory,
-          deps: [HttpClient]
-      }
-  })
+    CoreModule,
+    SharedModule
   ],
   providers: [],
   bootstrap: [AppComponent]

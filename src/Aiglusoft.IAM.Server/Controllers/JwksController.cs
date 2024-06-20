@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Aiglusoft.IAM.Server.Controllers
 {
-    [Route(".well-known/jwks.json")]
+    [ApiController]
     public class JwksController : ControllerBase
     {
         private readonly ISender _sender;
@@ -14,7 +14,7 @@ namespace Aiglusoft.IAM.Server.Controllers
             _sender = mediator;
         }
 
-        [HttpGet]
+        [HttpGet("~/.well-known/jwks.json")]
         public async Task<IActionResult> Get()
         {
             var jwks = await _sender.Send(new GetJwksQuery());

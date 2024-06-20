@@ -5,6 +5,7 @@ import { AuthCarouselComponent } from './components/auth-carousel/auth-carousel.
 import { TogglePasswordVisibilityDirective } from './directive/toggle-password-visibility/toggle-password-visibility.directive';
 import { FormFieldComponent } from './form-field/form-field.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,9 @@ import { TranslateModule } from '@ngx-translate/core';
   ],
   imports: [
     CommonModule,
-    TranslateModule
+    TranslateModule,
+
+    ReactiveFormsModule,
   ],
   exports: [
     // Shared components, directives, pipes
@@ -24,7 +27,9 @@ import { TranslateModule } from '@ngx-translate/core';
     FormFieldComponent,
     TogglePasswordVisibilityDirective,
     AuthCarouselComponent, 
-    TranslateModule
+    TranslateModule,
+
+    ReactiveFormsModule,
   ]
 })
 export class SharedModule { }

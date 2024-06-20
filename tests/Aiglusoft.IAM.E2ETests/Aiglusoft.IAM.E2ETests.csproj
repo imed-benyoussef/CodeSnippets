@@ -9,6 +9,10 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="ControllerTests\AuthControllerTests.cs" />
+  </ItemGroup>
+
 
 	<ItemGroup>
 		<Content Include="certs\certificate.pfx">

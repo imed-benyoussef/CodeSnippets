@@ -1,70 +1,106 @@
 {
     "features": {
         "auth": {
-            "components": {
-                "emailVerification": {
-                    "VERIFY_EMAIL": "Vérifiez Votre Email",
-                    "VERIFY_EMAIL_MESSAGE": "Nous avons envoyé un email de vérification à example@abc.com. Veuillez le vérifier.",
-                    "VERIFY_BUTTON": "Vérifier l'email",
-                    "DIDNT_RECEIVE_EMAIL": "Vous n'avez pas reçu d'email ?",
-                    "RESEND": "Renvoyer"
-                },
-                "forgotPassword": {
-                    "FORGOT_PASSWORD_TO": "Mot de passe oublié pour",
-                    "APPNAME": "Aiglusoft",
-                    "FORGOT_YOUR_PASSWORD": "Vous avez oublié votre mot de passe ?",
-                    "NEW_PASSWORD": "Nouveau mot de passe",
-                    "CONFIRM_PASSWORD": "Confirmez le mot de passe",
-                    "RESET_BUTTON": "Réinitialiser",
-                    "REMEMBER_IT": "Vous vous en souvenez ?",
-                    "SIGN_IN": "Se connecter"
-                },
-                "lockscreen": {
-                    "LOCKSCREEN_TO": "Écran de verrouillage pour",
-                    "APPNAME": "Aiglusoft",
-                    "ENTER_PASSWORD": "Entrez le mot de passe",
-                    "UNLOCK_BUTTON": "Déverrouiller",
-                    "NOT_YOU_RETURN": "Ce n'est pas vous ? revenir",
-                    "SIGN_IN": "Se connecter"
-                },
-                "recoverPassword": {
-                    "RECOVER_PASSWORD_TO": "Récupérer le mot de passe pour",
-                    "APPNAME": "Aiglusoft",
-                    "RE_PASSWORD_WITH_APPNAME": "Réinitialiser le mot de passe avec Aiglusoft.",
-                    "ENTER_EMAIL_INSTRUCTIONS": "Entrez votre email et les instructions vous seront envoyées !",
-                    "ENTER_EMAIL": "Entrez votre email",
-                    "SEND_REQUEST_BUTTON": "Envoyer la demande"
-                },
-                "signin": {
-                    "WELCOME_TO": "Bienvenue chez",
-                    "APPNAME": "Aiglusoft",
-                    "SIGN_IN_TO_CONTINUE": "Connectez-vous pour continuer chez Aiglusoft.",
-                    "USERNAME": "Nom d'utilisateur",
-                    "ENTER_USERNAME": "Entrez le nom d'utilisateur",
-                    "PASSWORD": "Mot de passe",
-                    "ENTER_PASSWORD": "Entrez le mot de passe",
-                    "REMEMBER_ME": "Se souvenir de moi",
-                    "FORGOT_PASSWORD": "Mot de passe oublié?",
-                    "LOG_IN": "Se connecter",
-                    "DONT_HAVE_ACCOUNT": "Vous n'avez pas de compte?",
-                    "SIGN_UP": "S'inscrire"
-                },
-                "signup": {
-                    "REGISTER_ACCOUNT_TO": "Créer un compte chez",
-                    "APPNAME": "Aiglusoft",
-                    "SIGN_IN_TO_CONTINUE": "Connectez-vous pour continuer chez Aiglusoft.",
-                    "EMAIL": "Email",
-                    "ENTER_EMAIL": "Entrez votre email",
-                    "USERNAME": "Nom d'utilisateur",
-                    "ENTER_USERNAME": "Entrez votre nom d'utilisateur",
-                    "PASSWORD": "Mot de passe",
-                    "ENTER_PASSWORD": "Entrez votre mot de passe",
-                    "AGREE_TERMS": "J'accepte tous les termes et conditions.",
-                    "REGISTER_BUTTON": "S'inscrire",
-                    "ALREADY_HAVE_ACCOUNT": "Vous avez déjà un compte?",
-                    "SIGN_IN": "Se connecter"
-                }
+          "components": {
+            "emailVerification": {
+              "VERIFY_EMAIL": "Vérifiez Votre Email",
+              "VERIFY_EMAIL_MESSAGE": "Nous avons envoyé un email de vérification à example@abc.com. Veuillez le vérifier.",
+              "VERIFY_BUTTON": "Vérifier l'email",
+              "DIDNT_RECEIVE_EMAIL": "Vous n'avez pas reçu d'email ?",
+              "RESEND": "Renvoyer"
+            },
+            "forgotPassword": {
+              "FORGOT_PASSWORD_TO": "Mot de passe oublié pour",
+              "APPNAME": "Aiglusoft",
+              "FORGOT_YOUR_PASSWORD": "Vous avez oublié votre mot de passe ?",
+              "NEW_PASSWORD": "Nouveau mot de passe",
+              "CONFIRM_PASSWORD": "Confirmez le mot de passe",
+              "RESET_BUTTON": "Réinitialiser",
+              "REMEMBER_IT": "Vous vous en souvenez ?",
+              "SIGN_IN": "Se connecter"
+            },
+            "lockscreen": {
+              "LOCKSCREEN_TO": "Écran de verrouillage pour",
+              "APPNAME": "Aiglusoft",
+              "ENTER_PASSWORD": "Entrez le mot de passe",
+              "UNLOCK_BUTTON": "Déverrouiller",
+              "NOT_YOU_RETURN": "Ce n'est pas vous ? revenir",
+              "SIGN_IN": "Se connecter"
+            },
+            "recoverPassword": {
+              "RECOVER_PASSWORD_TO": "Récupérer le mot de passe pour",
+              "APPNAME": "Aiglusoft",
+              "RE_PASSWORD_WITH_APPNAME": "Réinitialiser le mot de passe avec Aiglusoft.",
+              "ENTER_EMAIL_INSTRUCTIONS": "Entrez votre email et les instructions vous seront envoyées !",
+              "ENTER_EMAIL": "Entrez votre email",
+              "SEND_REQUEST_BUTTON": "Envoyer la demande",
+              "ERRORS": {
+                "EMAIL_REQUIRED": "L'email est requis",
+                "EMAIL_INVALID": "L'email est invalide"
+              },
+              "SUCCESS_MESSAGE": "Un email avec des instructions de réinitialisation du mot de passe a été envoyé.",
+              "ERROR_MESSAGE": "Une erreur s'est produite lors de la récupération du mot de passe."
+
+            },
+            "signin": {
+              "WELCOME_TO": "Bienvenue chez",
+              "APPNAME": "Aiglusoft",
+              "SIGN_IN_TO_CONTINUE": "Connectez-vous pour continuer chez Aiglusoft.",
+              "USERNAME": "Nom d'utilisateur",
+              "ENTER_USERNAME": "Entrez le nom d'utilisateur",
+              "PASSWORD": "Mot de passe",
+              "ENTER_PASSWORD": "Entrez le mot de passe",
+              "REMEMBER_ME": "Se souvenir de moi",
+              "FORGOT_PASSWORD": "Mot de passe oublié?",
+              "LOG_IN": "Se connecter",
+              "DONT_HAVE_ACCOUNT": "Vous n'avez pas de compte?",
+              "SIGN_UP": "S'inscrire",
+              "ERRORS": {
+                "USERNAME_REQUIRED": "Le nom d'utilisateur est requis",
+                "PASSWORD_REQUIRED": "Le mot de passe est requis",
+                "PASSWORD_MINLENGTH": "Le mot de passe doit comporter au moins 6 caractères"
+              }
+            },
+            "signup": {
+              "REGISTER_ACCOUNT_TO": "Créer un compte chez",
+              "APPNAME": "Aiglusoft",
+              "SIGN_IN_TO_CONTINUE": "Connectez-vous pour continuer chez Aiglusoft.",
+              "EMAIL": "Email",
+              "ENTER_EMAIL": "Entrez votre email",
+              "USERNAME": "Nom d'utilisateur",
+              "ENTER_USERNAME": "Entrez votre nom d'utilisateur",
+              "PASSWORD": "Mot de passe",
+              "ENTER_PASSWORD": "Entrez votre mot de passe",
+              "AGREE_TERMS": "J'accepte tous les termes et conditions.",
+              "REGISTER_BUTTON": "S'inscrire",
+              "ALREADY_HAVE_ACCOUNT": "Vous avez déjà un compte?",
+              "SIGN_IN": "Se connecter",
+              "ERRORS": {
+                "EMAIL_REQUIRED": "L'email est requis",
+                "EMAIL_INVALID": "L'email est invalide",
+                "USERNAME_REQUIRED": "Le nom d'utilisateur est requis",
+                "PASSWORD_REQUIRED": "Le mot de passe est requis",
+                "PASSWORD_MINLENGTH": "Le mot de passe doit comporter au moins 6 caractères",
+                "AGREE_TERMS_REQUIRED": "Vous devez accepter les termes et conditions"
+              }
+            },
+            "resetPassword": {
+              "RESET_PASSWORD_TO": "Réinitialiser le mot de passe pour",
+              "APPNAME": "Aiglusoft",
+              "RESET_YOUR_PASSWORD": "Réinitialisez votre mot de passe.",
+              "NEW_PASSWORD": "Nouveau mot de passe",
+              "CONFIRM_PASSWORD": "Confirmez le mot de passe",
+              "RESET_BUTTON": "Réinitialiser",
+              "ERRORS": {
+                "PASSWORD_REQUIRED": "Le mot de passe est requis.",
+                "CONFIRM_PASSWORD_REQUIRED": "La confirmation du mot de passe est requise.",
+                "PASSWORDS_MUST_MATCH": "Les mots de passe doivent correspondre."
+              },
+              "SUCCESS_MESSAGE": "Votre mot de passe a été réinitialisé avec succès.",
+              "ERROR_MESSAGE": "Échec de la réinitialisation du mot de passe. Veuillez réessayer.",
+              "REDIRECT_IN": "Redirection dans {{seconds}} secondes"
             }
+          }
         }
     }
 }

@@ -1,65 +1,153 @@
-﻿using Aiglusoft.IAM.Application.Commands;
-using Aiglusoft.IAM.Application.Commands.GenerateAuthorizationCode;
-using Aiglusoft.IAM.Infrastructure.Services;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Aiglusoft.IAM.Application.Commands;
+using Aiglusoft.IAM.Application.Exceptions;
+using Aiglusoft.IAM.Domain;
 using Aiglusoft.IAM.Server.Extensions;
+using Aiglusoft.IAM.Server.Models;
+using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using System.Reflection;
 
 namespace Aiglusoft.IAM.Server.Controllers
 {
-
     [ApiController]
+    [Route("connect")]
     public class AuthorizationController : ControllerBase
     {
-        private readonly ISender _sender;
+        private readonly IMediator _mediator;
+        private readonly IRootContext _rootContext;
 
-        public AuthorizationController(ISender mediator)
+        public AuthorizationController(IMediator mediator, IRootContext rootContext)
         {
-            _sender = mediator;
+            _mediator = mediator;
+            _rootContext = rootContext;
         }
 
-        ///// <summary>
-        ///// Action pour l'endpoint /connect/authorize.
-        ///// Gère la demande d'autorisation OAuth 2.0.
-        ///// </summary>
-        ///// <param name="cancellationToken">Le jeton d'annulation facultatif.</param>
-        ///// <returns>Une action de redirection vers l'URL de redirection.</returns>
-        //[HttpGet("~/connect/authorize")]
-        //public async Task<IActionResult> GetAuthorize(CancellationToken cancellationToken = default)
-        //{
-        //    var request = HttpContext.GetOidcServerRequest();
+        [HttpGet("authorize")]
+        public async Task<IActionResult> Authorize()
+        {
+            // Check if the user is authenticated
+            var userId = await _rootContext.GetUserIdAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Challenge(new AuthenticationProperties { RedirectUri = $"{Request.Path}{Request.QueryString}" }, CookieAuthenticationDefaults.AuthenticationScheme);
+            }
 
-        //    if (request.IsAuthorizationCodeRequest())
-        //    {
-        //        var command = new GenerateAuthorizationCodeCommand(request.ClientId, request.RedirectUri, request.State);
-        //        var authorizationCode = await _sender.Send(command, cancellationToken);
+            var request = HttpContext.GetOidcServerRequest();
 
-        //        var uriBuilder = new UriBuilder(request.RedirectUri);
-        //        var query = System.Web.HttpUtility.ParseQueryString(uriBuilder.Query);
-        //        query["code"] = authorizationCode;
-        //        query["state"] = request.State;
-        //        uriBuilder.Query = query.ToString();
-        //        var redirectUrl = uriBuilder.ToString();
+            var command = new AuthorizeCommand
+            {
+                ResponseType = request.ResponseType,
+                ClientId = request.ClientId,
+                RedirectUri = request.RedirectUri,
+                State = request.State,
+                Scope = request.Scope,
+                CodeChallenge = request.CodeChallenge,
+                CodeChallengeMethod = request.CodeChallengeMethod,
+                Nonce = request.Nonce,
+                Prompt = request.Prompt,
+                MaxAge = request.MaxAge,
+                Display = request.Display,
+                AcrValues = request.AcrValues,
+                IdTokenHint = request.IdTokenHint,
+                LoginHint = request.LoginHint
+            };
 
-        //        return Redirect(redirectUrl);
-        //    }
+            if (!IsValidResponseType(command.ResponseType))
+            {
+                return BadRequest(new
+                {
+                    error = "unsupported_response_type",
+                    error_description = "ResponseType must include 'code'."
+                });
+            }
 
-        //    throw new NotImplementedException("Le type de flux spécifié n'est pas implémenté.");
+            try
+            {
+                var redirectUriResult = await _mediator.Send(command);
+                return Redirect(redirectUriResult);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new
+                {
+                    error = ex.Errors.FirstOrDefault()?.ErrorCode ?? "invalid_request",
+                    error_description = ex.Errors.FirstOrDefault()?.ErrorMessage ?? "Invalid request parameters."
+                });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                var errorParts = ex.Message.Split(": ");
+                return Unauthorized(new
+                {
+                    error = errorParts[0],
+                    error_description = errorParts.Length > 1 ? errorParts[1] : ex.Message
+                });
+            }
+        }
 
-        //}
-
-        [HttpPost("~/connect/token")]
-        public async Task<IActionResult> PostToken(CancellationToken cancellationToken = default)
+        [HttpPost("token")]
+        public async Task<IActionResult> Token()
         {
             var request = HttpContext.GetOidcServerRequest();
 
-            var command = new ExchangeAuthorizationCodeCommand(request.Code, request.ClientId, request.ClientSecret, request.RedirectUri, request.GrantType);
+            if (request == null)
+            {
+                return BadRequest(new ErrorResponse
+                {
+                    Error = "invalid_request",
+                    ErrorDescription = "Request body is missing."
+                });
+            }
 
-            var tokenResponse = await _sender.Send(command, cancellationToken);
-            return Ok(tokenResponse);
+            var command = new TokenCommand
+            {
+                GrantType = request.GrantType,
+                Code = request.Code,
+                RedirectUri = request.RedirectUri,
+                ClientId = request.ClientId,
+                ClientSecret = request.ClientSecret
+            };
+
+            try
+            {
+                var tokenResponse = await _mediator.Send(command);
+                var jsonResponse = new
+                {
+                    access_token = tokenResponse.AccessToken,
+                    token_type = tokenResponse.TokenType,
+                    expires_in = tokenResponse.ExpiresIn,
+                    id_token = tokenResponse.IdToken,
+                    refresh_token = tokenResponse.RefreshToken,
+                    scope = tokenResponse.Scope
+                };
+                return Ok(jsonResponse);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new
+                {
+                    error = ex.Errors.FirstOrDefault()?.ErrorCode ?? "invalid_request",
+                    error_description = ex.Errors.FirstOrDefault()?.ErrorMessage ?? "Invalid request parameters."
+                });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                var errorParts = ex.Message.Split(": ");
+                return Unauthorized(new
+                {
+                    error = errorParts[0],
+                    error_description = errorParts.Length > 1 ? errorParts[1] : ex.Message
+                });
+            }
+        }
+
+        private bool IsValidResponseType(string responseType)
+        {
+            return responseType == "code" || responseType.Split(' ').Contains("code");
         }
     }
-
 }

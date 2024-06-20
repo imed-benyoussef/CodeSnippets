@@ -3,23 +3,26 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Aiglusoft.IAM.E2ETests.ControllerTests
 {
-    public class DiscoveryControllerTests : IClassFixture<WebApplicationFactory<Program>>
+    public class DiscoveryControllerTests : IClassFixture<AiglusoftWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Program> _factory;
+        private readonly HttpClient _client;
 
-        public DiscoveryControllerTests(WebApplicationFactory<Program> factory)
+        public DiscoveryControllerTests(AiglusoftWebApplicationFactory factory)
         {
-            _factory = factory;
+            _client = factory.CreateClient(new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = true,
+                BaseAddress = new Uri("https://localhost")
+            });
         }
 
         [Fact]
         public async Task Get_ShouldReturnDiscoveryDocument()
         {
-            // Arrange
-            var client = _factory.CreateClient();
+            
 
             // Act
-            var response = await client.GetAsync("/.well-known/openid-configuration");
+            var response = await _client.GetAsync("/.well-known/openid-configuration");
 
             // Assert
             response.EnsureSuccessStatusCode();

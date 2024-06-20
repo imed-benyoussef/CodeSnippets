@@ -1,7 +1,8 @@
 ﻿using Aiglusoft.IAM.Application.Exceptions;
+using Aiglusoft.IAM.Application.Extentions;
 using Aiglusoft.IAM.Server.Models;
-using Azure.Core;
 using MediatR;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace Aiglusoft.IAM.Server.Extensions
 {
@@ -21,67 +22,6 @@ namespace Aiglusoft.IAM.Server.Extensions
 
             return request;
         }
-
-        
-        public static bool IsAuthorizationCodeRequest(this OidcServerRequest request)
-        {
-            // Check required parameters for Authorization Code request
-            if (string.IsNullOrEmpty(request.ResponseType) || request.ResponseType != "code")
-            {
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(request.ClientId))
-            {
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(request.RedirectUri))
-            {
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(request.Scope))
-            {
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(request.State))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public static void ThrowIfNotValidAuthorizationCodeRequest(this OidcServerRequest request)
-        {
-            if (string.IsNullOrEmpty(request.ResponseType) || request.ResponseType != "code")
-            {
-                throw new OAuthException("invalid_request", "The response_type must be 'code'.");
-            }
-
-            if (string.IsNullOrEmpty(request.ClientId))
-            {
-                throw new OAuthException("invalid_request", "The client_id is missing.");
-            }
-
-            if (string.IsNullOrEmpty(request.RedirectUri))
-            {
-                throw new OAuthException("invalid_request", "The redirect_uri is missing.");
-            }
-
-            if (string.IsNullOrEmpty(request.Scope))
-            {
-                throw new OAuthException("invalid_request", "The scope is missing.");
-            }
-
-            if (string.IsNullOrEmpty(request.State))
-            {
-                throw new OAuthException("invalid_request", "The state is missing.");
-            }
-        }
-
 
         private static string GetRequestValue(this HttpRequest request, string key)
         {
@@ -116,8 +56,50 @@ namespace Aiglusoft.IAM.Server.Extensions
             nameof(OidcServerRequest.State) => "state",
             nameof(OidcServerRequest.Nonce) => "nonce",
             nameof(OidcServerRequest.Scope) => "scope",
+            nameof(OidcServerRequest.Prompt) => "prompt",
+            nameof(OidcServerRequest.MaxAge) => "max_age",
+            nameof(OidcServerRequest.Display) => "display",
+            nameof(OidcServerRequest.AcrValues) => "acr_values",
+            nameof(OidcServerRequest.IdTokenHint) => "id_token_hint",
+            nameof(OidcServerRequest.LoginHint) => "login_hint",
             _ => throw new ArgumentException($"Unknown property: {key}")
+
+
         };
 
+        public static string GetBaseUrl(this HttpContext context)
+        {
+            var request = context.Request;
+            var uri = new Uri(request.GetEncodedUrl());
+            var baseUri = $"{uri.Scheme}://{uri.Host}";
+
+            if (!(uri.IsDefaultPort || (uri.Scheme == Uri.UriSchemeHttp && uri.Port == 80) || (uri.Scheme == Uri.UriSchemeHttps && uri.Port == 443)))
+            {
+                baseUri += $":{uri.Port}";
+            }
+
+            return baseUri;
+        }
+
+        public static string GetAbsoluteUri(this HttpContext context)
+        {
+            var request = context.Request;
+            var uriBuilder = new UriBuilder
+            {
+                Scheme = request.Scheme,
+                Host = request.Host.Host,
+                Path = request.Path.ToString(),
+                Query = request.QueryString.ToString()
+            };
+
+            uriBuilder.RemoveDefaultPort();
+
+            if (request.Host.Port.HasValue)
+            {
+                uriBuilder.Port = request.Host.Port.Value;
+            }
+
+            return uriBuilder.Uri.ToString();
+        }
     }
 }

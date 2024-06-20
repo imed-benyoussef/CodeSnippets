@@ -3,6 +3,7 @@
 namespace Aiglusoft.IAM.Application.Extentions
 {
     using System;
+    using System.Net.Http;
     using System.Web;
 
     public static class UriBuilderExtensions
@@ -23,5 +24,6 @@ namespace Aiglusoft.IAM.Application.Extentions
             uriBuilder.Query = query.ToString();
         }
     }
+
 
 }
