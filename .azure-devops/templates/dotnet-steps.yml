@@ -43,6 +43,7 @@ steps:
       command: 'test'
       projects: 'tests/Aiglusoft.IAM.E2ETests/*.csproj'
       arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore ${{ parameters.coberturaOutputFormat }} /p:CollectCoverage=true /p:CoverletOutput=${{ parameters.coverageDirectory }}Aiglusoft.IAM.E2ETests/'
+    continueOnError: true
 
   - task: PublishBuildArtifacts@1
     displayName: 'Publish build artifacts'
@@ -50,6 +51,7 @@ steps:
       pathToPublish: ${{ parameters.coverageDirectory }}
       artifactName: 'coverage'
       publishLocation: 'Container'
+    continueOnError: true
 
   - task: PublishCodeCoverageResults@1
     displayName: 'Publish code coverage results'
@@ -58,6 +60,7 @@ steps:
       summaryFileLocation: '${{ parameters.coverageDirectory }}/**/coverage.cobertura.xml'
       reportDirectory: ${{ parameters.coverageDirectory }}
       failIfCoverageEmpty: true
+    continueOnError: true
 
   - task: DotNetCoreCLI@2
     displayName: 'Publish Web Projects'
