@@ -18,6 +18,11 @@ steps:
       command: 'restore'
       projects: ${{ parameters.solution }}
 
+  - script: |
+      find . -type f -name "*.esproj" -exec rm -f {} +
+    displayName: 'Remove .esproj files from solution'
+    continueOnError: true
+
   - task: DotNetCoreCLI@2
     displayName: 'Build Solution'
     inputs:
