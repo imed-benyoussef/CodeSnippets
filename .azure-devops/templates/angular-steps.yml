@@ -11,7 +11,7 @@ steps:
 
   - task: npmAuthenticate@0
     inputs:
-      workingFile: '.npmrc'
+      workingFile: 'src/aiglusoft.iam.client'
 
   - script: |
       cd src/aiglusoft.iam.client
