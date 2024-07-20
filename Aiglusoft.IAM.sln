@@ -24,6 +24,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{5259A9F0-97FE-484B-AAF5-E45704A47DA5}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		.azure-devops\templates\angular-steps.yml = .azure-devops\templates\angular-steps.yml
+		.azure-devops\azure-pipelines.yml = .azure-devops\azure-pipelines.yml
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -32,7 +34,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aiglusoft.IAM.Shared", "src\Aiglusoft.IAM.Shared\Aiglusoft.IAM.Shared.csproj", "{8497F744-A3DE-4D51-824A-E7C2B4B04DD3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aiglusoft.IAM.Shared", "src\Aiglusoft.IAM.Shared\Aiglusoft.IAM.Shared.csproj", "{8497F744-A3DE-4D51-824A-E7C2B4B04DD3}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{F7D5F84E-B256-4885-8E64-2C2B864CE097}"
 EndProject

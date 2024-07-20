@@ -9,13 +9,12 @@ steps:
       npm install -g @angular/cli@
     displayName: 'Install Angular CLI'
 
-  - task: npmAuthenticate@0
+  - task: Npm@1
     inputs:
-      workingFile: '.npmrc'
-
-  - script: |
-      cd src/aiglusoft.iam.client
-      npm install
+      command: 'ci'
+      workingDir: 'src/aiglusoft.iam.client'
+      customRegistry: 'useFeed'
+      customFeed: 'aiglusoft_npm_packages'
     displayName: 'Install Angular Dependencies'
 
   - script: |
