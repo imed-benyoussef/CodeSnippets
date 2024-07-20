@@ -1,5 +1,5 @@
 parameters:
-  solution: '**/*.sln'
+  solution: '**/Aiglusoft.IAM.sln'
   buildConfiguration: 'Release'
   coberturaOutputFormat: '/p:CoverletOutputFormat=cobertura'
   coverageDirectory: '$(Build.ArtifactStagingDirectory)/coverage/'

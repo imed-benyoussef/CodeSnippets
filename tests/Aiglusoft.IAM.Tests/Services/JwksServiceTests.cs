@@ -1,14 +1,14 @@
 ﻿
 namespace Aiglusoft.IAM.Tests.Services
 {
-    using Xunit;
-    using Moq;
-    using Aiglusoft.IAM.Infrastructure.Services;
-    using Microsoft.IdentityModel.Tokens;
-    using System.Security.Cryptography;
-    using Aiglusoft.IAM.Domain.Services;
+  using Xunit;
+  using Moq;
+  using Aiglusoft.IAM.Infrastructure.Services;
+  using Microsoft.IdentityModel.Tokens;
+  using System.Security.Cryptography;
+  using Aiglusoft.IAM.Domain.Services;
 
-    public class JwksServiceTests
+  public class JwksServiceTests
     {
         [Fact]
         public void GetJsonWebKeySet_ShouldReturnValidJwks()

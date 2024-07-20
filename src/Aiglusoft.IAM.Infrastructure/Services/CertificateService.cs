@@ -5,7 +5,7 @@ using Aiglusoft.IAM.Domain.Services;
 
 namespace Aiglusoft.IAM.Infrastructure.Services
 {
-    public class CertificateService : ICertificateService
+  public class CertificateService : ICertificateService
     {
         private readonly IConfiguration _configuration;
         private readonly X509Certificate2 _certificate;

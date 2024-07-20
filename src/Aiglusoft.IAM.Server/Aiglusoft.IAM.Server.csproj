@@ -14,12 +14,6 @@
 		<SpaProxyServerUrl>https://localhost:4233</SpaProxyServerUrl>
 	</PropertyGroup>
 
-	<ItemGroup>
-	  <Compile Remove="Middleware\**" />
-	  <Content Remove="Middleware\**" />
-	  <EmbeddedResource Remove="Middleware\**" />
-	  <None Remove="Middleware\**" />
-	</ItemGroup>
 
 	<!--GitVersion-->
 	<!-- <ItemGroup>

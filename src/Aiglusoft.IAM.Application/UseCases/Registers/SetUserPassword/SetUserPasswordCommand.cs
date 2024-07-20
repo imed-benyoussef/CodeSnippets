@@ -8,12 +8,12 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Aiglusoft.IAM.Application.UseCases.Registers.RegisterUserPassword
+namespace Aiglusoft.IAM.Application.UseCases.Registers.SetUserPassword
 {
-    public class SetUserPasswordCommand : IRequest<TokenResponse>
-    {
-        public string UserId { get; set; }
-        public string Password { get; set; }
-        public string ConfirmPassword { get; set; }
-    }
+  public class SetUserPasswordCommand : IRequest<TokenResponse>
+  {
+    public string UserId { get; set; }
+    public string Password { get; set; }
+    public string ConfirmPassword { get; set; }
+  }
 }

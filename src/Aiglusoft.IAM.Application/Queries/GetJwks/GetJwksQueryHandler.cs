@@ -1,10 +1,9 @@
 ﻿using MediatR;
 using Aiglusoft.IAM.Domain.Services;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Aiglusoft.IAM.Application.Queries.GetJwks
 {
-    public class GetJwksQueryHandler : IRequestHandler<GetJwksQuery, JsonWebKeySet>
+  public class GetJwksQueryHandler : IRequestHandler<GetJwksQuery, JsonWebKeySet>
     {
         private readonly IJwksService _jwksService;
 

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Aiglusoft.IAM.Application.Exceptions;
-using Aiglusoft.IAM.Infrastructure.Extentions;
+using Aiglusoft.IAM.Domain.Extentions;
 using Aiglusoft.IAM.Shared.Utilities;
 using FluentValidation;
 using MediatR;
@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Aiglusoft.IAM.Application.Behaviors
 {
-    public class ValidatorBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+  public class ValidatorBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
         private readonly ILogger<ValidatorBehavior<TRequest, TResponse>> _logger;

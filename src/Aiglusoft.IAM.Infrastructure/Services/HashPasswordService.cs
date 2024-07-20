@@ -4,7 +4,7 @@ using Aiglusoft.IAM.Domain.Services;
 
 namespace Aiglusoft.IAM.Infrastructure.Services
 {
-    public class HashPasswordService : IHashPasswordService
+  public class HashPasswordService : IHashPasswordService
     {
         private const int SaltSize = 16; // 128 bit
         private const int KeySize = 32; // 256 bit

@@ -19,7 +19,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace Aiglusoft.IAM.Application.UseCases.Emails.VerifyEmail
 {
-    internal class VerifyEmailCommandHandler : IRequestHandler<VerifyEmailCommand, TokenResponse>
+  internal class VerifyEmailCommandHandler : IRequestHandler<VerifyEmailCommand, TokenResponse>
     {
 
         private readonly ICodeValidatorRepository _codeValidatorRepository;

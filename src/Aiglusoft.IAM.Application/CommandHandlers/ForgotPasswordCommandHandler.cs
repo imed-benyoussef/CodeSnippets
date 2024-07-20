@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.Extensions.Localization;
-using Aiglusoft.IAM.Infrastructure.Services;
 using Aiglusoft.IAM.Domain.Exceptions;
 
 namespace Aiglusoft.IAM.Application.CommandHandlers

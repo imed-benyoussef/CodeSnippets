@@ -1,16 +1,15 @@
 ﻿namespace Aiglusoft.IAM.Server.Controllers
 {
-    using Aiglusoft.IAM.Application.DTOs;
-    using Aiglusoft.IAM.Application.UseCases.Emails.VerifyEmail;
-    using Aiglusoft.IAM.Application.UseCases.Registers.CheckUserEmail;
-    using Aiglusoft.IAM.Application.UseCases.Registers.RegisterUserPassword;
-    using Aiglusoft.IAM.Server.Models.V1.Requests;
-    using MediatR;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using System.Security.Claims;
+  using Aiglusoft.IAM.Application.UseCases.Emails.VerifyEmail;
+  using Aiglusoft.IAM.Application.UseCases.Registers.CheckUserEmail;
+  using Aiglusoft.IAM.Application.UseCases.Registers.SetUserPassword;
+  using Aiglusoft.IAM.Server.Models.V1.Requests;
+  using MediatR;
+  using Microsoft.AspNetCore.Authorization;
+  using Microsoft.AspNetCore.Mvc;
+  using System.Security.Claims;
 
-    [ApiController]
+  [ApiController]
     [Route("api/v{version:apiVersion}/register")]
     public class RegisterController : ControllerBase
     {

@@ -6,7 +6,7 @@ using MediatR;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.Extensions.Localization;
-using Aiglusoft.IAM.Infrastructure.Services;
+using Aiglusoft.IAM.Domain.Services;
 
 namespace Aiglusoft.IAM.Application.CommandHandlers
 {

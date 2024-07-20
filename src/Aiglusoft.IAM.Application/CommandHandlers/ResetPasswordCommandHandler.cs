@@ -1,11 +1,12 @@
-﻿using Aiglusoft.IAM.Application.Commands;
-using Aiglusoft.IAM.Domain;
+﻿
+
+using Aiglusoft.IAM.Application.Commands;
 using Aiglusoft.IAM.Domain.Repositories;
+using Aiglusoft.IAM.Domain.Services;
 using MediatR;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Aiglusoft.IAM.Infrastructure.Services;
 
 namespace Aiglusoft.IAM.Application.CommandHandlers
 {

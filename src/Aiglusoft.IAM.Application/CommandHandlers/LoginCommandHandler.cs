@@ -1,7 +1,7 @@
 ﻿using Aiglusoft.IAM.Application.Commands;
 using Aiglusoft.IAM.Application.DTOs;
-using Aiglusoft.IAM.Domain;
 using Aiglusoft.IAM.Domain.Repositories;
+using Aiglusoft.IAM.Domain.Services;
 using MediatR;
 using Microsoft.Extensions.Localization;
 

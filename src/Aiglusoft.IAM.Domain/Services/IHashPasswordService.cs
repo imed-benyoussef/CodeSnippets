@@ -1,10 +1,8 @@
-﻿using Aiglusoft.IAM.Domain.Model;
-
-namespace Aiglusoft.IAM.Domain.Services
+﻿namespace Aiglusoft.IAM.Domain.Services
 {
-    public interface IHashPasswordService
-    {
-        string HashPassword(string password, string securityStamp);
-        bool VerifyPassword(string password, string passwordHash, string securityStamp);
-    }
+  public interface IHashPasswordService
+  {
+    string HashPassword(string password, string securityStamp);
+    bool VerifyPassword(string password, string passwordHash, string securityStamp);
+  }
 }
