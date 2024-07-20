@@ -75,45 +75,7 @@ stages:
         fetchDepth: 0
         clean: true
 
-      - task: NodeTool@0
-        displayName: 'Install Node.js 22.x'
-        inputs:
-          versionSpec: '22.x'
-          checkLatest: true
-
-      - script: |
-          npm install -g @angular/cli
-        displayName: 'Install Angular CLI'
-
-      - task: Npm@1
-        inputs:
-          command: 'install'
-          workingDir: 'src/aiglusoft.iam.client'
-          verbose: true
-          customRegistry: 'useFeed'
-          customFeed: 'aiglusoft_npm_packages'
-        displayName: 'Install Angular Dependencies'
-
-      - script: |
-          cd src/aiglusoft.iam.client
-          ng test --watch=false --browsers=ChromeHeadless --code-coverage
-        displayName: 'Run Angular Unit Tests and Generate Coverage'
-        continueOnError: true
-
-      # - task: PublishCodeCoverageResults@1
-      #   displayName: 'Publish Angular Code Coverage Results'
-      #   inputs:
-      #     codeCoverageTool: 'Cobertura'
-      #     summaryFileLocation: 'src/aiglusoft.iam.client/coverage/aiglusoft.iam.client/coverage-summary.json'
-      #     reportDirectory: 'src/aiglusoft.iam.client/coverage/aiglusoft.iam.client'
-      #     failIfCoverageEmpty: true
-      #   continueOnError: true
-
-      - script: |
-          cd src/aiglusoft.iam.client
-          ng build --output-path=src/aiglusoft.iam.client/dist
-        displayName: 'Build Angular Project and Copy to dist'
-
+      - template: templates/angular-steps.yml
       - template: templates/dotnet-steps.yml
         parameters:
           solution: ${{ variables.solution }}
