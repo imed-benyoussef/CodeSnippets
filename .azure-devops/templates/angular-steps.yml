@@ -6,7 +6,7 @@ steps:
       checkLatest: true
 
   - script: |
-      npm install -g @angular/cli@
+      npm install -g @angular/cli
     displayName: 'Install Angular CLI'
 
   - task: npmAuthenticate@0
