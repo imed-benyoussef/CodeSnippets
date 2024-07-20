@@ -27,7 +27,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  solution: '**/*.sln'
+  solution: '**/Aiglusoft.IAM.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   coberturaOutputFormat: '/p:CoverletOutputFormat=cobertura'
