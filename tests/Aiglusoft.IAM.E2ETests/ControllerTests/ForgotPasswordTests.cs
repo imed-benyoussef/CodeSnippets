@@ -14,6 +14,7 @@ namespace Aiglusoft.IAM.E2ETests.ControllerTests
         [Fact]
         public async Task ForgotPassword_ShouldSendEmail()
         {
+
             // Arrange
             var email = "testuser@example.com";
             var content = new StringContent($"{{\"email\":\"{email}\"}}", Encoding.UTF8, "application/json");
