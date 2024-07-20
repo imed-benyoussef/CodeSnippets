@@ -11,9 +11,9 @@ steps:
 
   - task: Npm@1
     inputs:
-      command: 'install'
+      command: 'custom'
       workingDir: 'src/aiglusoft.iam.client'
-      verbose: true
+      customCommand: 'install --legacy-peer-deps'
       customRegistry: 'useFeed'
       customFeed: 'aiglusoft_npm_packages'
     displayName: 'Install Angular Dependencies'
