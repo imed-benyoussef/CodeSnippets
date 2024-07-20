@@ -6,8 +6,12 @@ steps:
       checkLatest: true
 
   - script: |
-      npm install -g @angular/cli@17
-    displayName: 'Install Angular CLI 17'
+      npm install -g @angular/cli@
+    displayName: 'Install Angular CLI'
+
+  - task: npmAuthenticate@0
+    inputs:
+      workingFile: '.npmrc'
 
   - script: |
       cd src/aiglusoft.iam.client
