@@ -9,7 +9,7 @@ steps:
       npm install -g @angular/cli@
     displayName: 'Install Angular CLI'
 
-  - task: Npm@1
+  - task: npmAuthenticate@0
     inputs:
       command: 'ci'
       workingDir: 'src/aiglusoft.iam.client'
