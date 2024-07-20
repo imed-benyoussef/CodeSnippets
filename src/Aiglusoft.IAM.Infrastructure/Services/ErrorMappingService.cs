@@ -1,51 +1,76 @@
 ﻿using Aiglusoft.IAM.Application.Exceptions;
+using Aiglusoft.IAM.Domain.Exceptions;
 using Aiglusoft.IAM.Shared.Utilities;
+using FluentValidation;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Aiglusoft.IAM.Infrastructure.Services
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+
     public class ErrorMappingService
     {
         private readonly IDictionary<Type, HttpStatusCode> _exceptionStatusCodeMapping = new Dictionary<Type, HttpStatusCode>
-        {
-            { typeof(InvalidRequestException), HttpStatusCode.BadRequest },
-            { typeof(InvalidClientException), HttpStatusCode.Unauthorized },
-            { typeof(InvalidRedirectUriException), HttpStatusCode.BadRequest },
-            { typeof(UnsupportedResponseTypeException), HttpStatusCode.BadRequest },
-            // Add other mappings as necessary
-        };
+    {
+        { typeof(InvalidClientException), HttpStatusCode.Unauthorized },
+        { typeof(UnauthorizedAccessException), HttpStatusCode.Unauthorized },
+        { typeof(Application.Exceptions.UnauthorizedAccessException), HttpStatusCode.Unauthorized },
+        { typeof(InvalidRequestException), HttpStatusCode.BadRequest },
+        { typeof(InvalidRedirectUriException), HttpStatusCode.BadRequest },
+        { typeof(UnsupportedResponseTypeException), HttpStatusCode.BadRequest },
+        // Add other mappings as necessary
+    };
 
         public (HttpStatusCode statusCode, string error, string errorDescription) Map(Exception exception)
         {
-            if (exception is AppException appException)
+           var errorCode = GetErrorCode(exception);
+
+            if (exception as AppException != null || exception as DomainException != null)
             {
-                var errorCode = string.IsNullOrEmpty(appException.Code)
-                    ? GenerateCodeFromClassName(appException.GetType().Name)
-                    : appException.Code;
 
                 if (_exceptionStatusCodeMapping.TryGetValue(exception.GetType(), out var statusCode))
                 {
-                    return (statusCode, errorCode, appException.Message);
+                    return (statusCode, errorCode, exception.Message);
                 }
 
-                // Default to internal server error for unhandled AppException
-                return (HttpStatusCode.InternalServerError, errorCode, appException.Message);
+                // Default to BadRequest for unhandled IErrorCodeException
+                return (HttpStatusCode.BadRequest, errorCode, exception.Message);
             }
 
             // Default to internal server error for other unhandled exceptions
             return (HttpStatusCode.InternalServerError, "server_error", "An unexpected error occurred.");
         }
 
-        private string GenerateCodeFromClassName(string className)
+        public string GetErrorCode(Exception exception)
         {
-            if (className.EndsWith("Exception"))
+            var code = "";
+            var codeProperty = exception.GetType().GetProperty("Code");
+            if (codeProperty != null && codeProperty.CanRead)
             {
-                className = className.Substring(0, className.Length - "Exception".Length);
+                code = codeProperty.GetValue(exception) as string;
             }
-            return className.ToSnakeCase();
+            if (string.IsNullOrEmpty(code))
+            {
+                code = exception.GetType().Name;
+                if (code.EndsWith("Exception"))
+                {
+                    code = code.Substring(0, code.Length - "Exception".Length);
+                }
+            }
+  
+
+            return code!.ToSnakeCase();
         }
+
+
     }
+
 }
 

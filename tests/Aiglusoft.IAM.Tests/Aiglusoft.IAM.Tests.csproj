@@ -18,6 +18,11 @@
 
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.6" />
+  </ItemGroup>
+
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Aiglusoft.IAM.Server\Aiglusoft.IAM.Server.csproj" />
   </ItemGroup>
 

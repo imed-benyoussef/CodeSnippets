@@ -2,11 +2,10 @@
 using Aiglusoft.IAM.Application.DTOs;
 using Aiglusoft.IAM.Application.Exceptions;
 using Aiglusoft.IAM.Domain;
-using Aiglusoft.IAM.Domain.Entities;
+using Aiglusoft.IAM.Domain.Model;
 using Aiglusoft.IAM.Domain.Factories;
 using Aiglusoft.IAM.Domain.Repositories;
 using Aiglusoft.IAM.Domain.Services;
-using Aiglusoft.IAM.Infrastructure.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +13,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.Extensions.Localization;
+using Aiglusoft.IAM.Domain.Exceptions;
+using Aiglusoft.IAM.Domain.Model.AuthorizationAggregates;
 
 namespace Aiglusoft.IAM.Application.CommandHandlers
 {
@@ -26,6 +28,7 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
         private readonly IValidator<AuthorizeCommand> _validator;
         private readonly ILogger<AuthorizeCommandHandler> _logger;
         private readonly IRootContext _rootContext;
+        private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public AuthorizeCommandHandler(
             IClientRepository clientRepository,
@@ -33,7 +36,8 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
             IUserRepository userRepository,
             IValidator<AuthorizeCommand> validator,
             ILogger<AuthorizeCommandHandler> logger,
-            IRootContext rootContext)
+            IRootContext rootContext,
+            IStringLocalizer<ErrorMessages> localizer)
         {
             _clientRepository = clientRepository;
             _authorizationCodeRepository = authorizationCodeRepository;
@@ -41,42 +45,43 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
             _validator = validator;
             _logger = logger;
             _rootContext = rootContext;
+            _localizer = localizer;
         }
 
         public async Task<string> Handle(AuthorizeCommand request, CancellationToken cancellationToken)
         {
             // Validate the command
-            var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-            if (!validationResult.IsValid)
-            {
-                var error = validationResult.Errors.FirstOrDefault();
-                if (error != null)
-                {
-                    throw new InvalidRequestException(error.ErrorMessage);
-                }
-                throw new InvalidRequestException("Invalid request parameters");
-            }
+            //var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+            //if (!validationResult.IsValid)
+            //{
+            //    var error = validationResult.Errors.FirstOrDefault();
+            //    if (error != null)
+            //    {
+            //        throw new InvalidRequestException(error.ErrorMessage);
+            //    }
+            //    throw new InvalidRequestException("Invalid request parameters");
+            //}
 
             // Validate client
             var client = await _clientRepository.GetByIdAsync(request.ClientId);
             if (client == null)
             {
                 _logger.LogError("Invalid client_id: {ClientId}", request.ClientId);
-                throw new InvalidClientException("Invalid client_id");
+                throw new InvalidClientException(_localizer, "InvalidClient", request.ClientId);
             }
 
             // Validate redirect URI
             if (!client.RedirectUris.Any(r => r.RedirectUri == request.RedirectUri))
             {
                 _logger.LogError("Invalid redirect_uri: {RedirectUri}", request.RedirectUri);
-                throw new InvalidRedirectUriException("Invalid redirect_uri");
+                throw new InvalidRedirectUriException(_localizer, "InvalidRedirectUri", "");
             }
 
             // Validate response type
             if (!IsValidResponseType(request.ResponseType))
             {
                 _logger.LogError("Invalid response_type: {ResponseType}", request.ResponseType);
-                throw new UnsupportedResponseTypeException("Invalid response_type");
+                throw new UnsupportedResponseTypeException(_localizer, "InvalidResponseType");
             }
 
             // Validate user
@@ -85,13 +90,13 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
             if (user == null)
             {
                 _logger.LogError("Invalid user_id: {UserId}", userId);
-                throw new UnauthorizedAccessException("Invalid user");
+                throw new Exceptions.UnauthorizedAccessException(_localizer, "UnauthorizedAccess");
             }
 
             // Generate authorization code
             var authorizationCode = new AuthorizationCode(
-                client, 
-                user, 
+                client,
+                user,
                 request.RedirectUri,
                 request.Scope,
                 DateTime.UtcNow.AddMinutes(10),
@@ -132,19 +137,22 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
         private readonly ITokenRepository _tokenRepository;
         private readonly ITokenFactory _tokenFactory;
         private readonly IJwtTokenService _jwtTokenService;
+        private readonly IStringLocalizer<ErrorMessages> _localizerErrorMessages;
 
         public TokenCommandHandler(
             IAuthorizationCodeRepository authorizationCodeRepository,
             IClientRepository clientRepository,
             ITokenRepository tokenRepository,
             ITokenFactory tokenFactory,
-            IJwtTokenService jwtTokenService)
+            IJwtTokenService jwtTokenService,
+            IStringLocalizer<ErrorMessages> localizer)
         {
             _authorizationCodeRepository = authorizationCodeRepository;
             _clientRepository = clientRepository;
             _tokenRepository = tokenRepository;
             _tokenFactory = tokenFactory;
             _jwtTokenService = jwtTokenService;
+            _localizerErrorMessages = localizer;
         }
 
         public async Task<TokenResponse> Handle(TokenCommand request, CancellationToken cancellationToken)
@@ -153,14 +161,14 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
             var client = await _clientRepository.GetByIdAsync(request.ClientId);
             if (client == null || client.ClientSecret != request.ClientSecret)
             {
-                throw new UnauthorizedAccessException("Invalid client credentials.");
+                throw new Exceptions.UnauthorizedAccessException(_localizerErrorMessages, "InvalidClientCredentials");
             }
 
             // Validate the authorization code
             var authorizationCode = await _authorizationCodeRepository.GetByCodeAsync(request.Code);
             if (authorizationCode == null || authorizationCode.ClientId != request.ClientId || authorizationCode.IsExpired())
             {
-                throw new UnauthorizedAccessException("Invalid authorization code.");
+                throw new Exceptions.UnauthorizedAccessException(_localizerErrorMessages, "InvalidAuthorizationCode");
             }
 
             var accessTokenExpiry = DateTime.UtcNow.AddHours(1);
@@ -170,7 +178,7 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
             {
                 var idTokenClaims = new List<Claim>
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub, authorizationCode.User.UserId),
+                    new Claim(JwtRegisteredClaimNames.Sub, authorizationCode.User.Id),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
                     new Claim("nonce", authorizationCode.CodeChallenge),
@@ -182,7 +190,7 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
             // Generate the access token using id_token if it's available
             var accessTokenClaims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, authorizationCode.User.UserId),
+                new Claim(JwtRegisteredClaimNames.Sub, authorizationCode.User.Id),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
             };
@@ -211,64 +219,68 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
         }
     }
 
-    public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, string>
-    {
-        private readonly IUserRepository _userRepository;
-        private readonly IUserFactory _userFactory;
+    //public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, string>
+    //{
+    //    private readonly IUserRepository _userRepository;
+    //    private readonly IUserFactory _userFactory;
 
-        public RegisterUserCommandHandler(IUserRepository userRepository, IUserFactory userFactory)
-        {
-            _userRepository = userRepository;
-            _userFactory = userFactory;
-        }
+    //    private readonly IStringLocalizer<ErrorMessages> _localizerErrorMessages;
+    //    public RegisterUserCommandHandler(IUserRepository userRepository, IUserFactory userFactory, IStringLocalizer<ErrorMessages> localizerErrorMessages)
+    //    {
+    //        _userRepository = userRepository;
+    //        _userFactory = userFactory;
+    //        _localizerErrorMessages = localizerErrorMessages;
+    //    }
 
-        public async Task<string> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
-        {
-            // Check if the username is already in use
-            var existingUserByUsername = await _userRepository.GetByUsernameAsync(request.Username);
-            if (existingUserByUsername != null)
-            {
-                throw new UserAlreadyExistsException("Username is already in use.");
-            }
+    //    public async Task<string> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    //    {
+    //        // Check if the username is already in use
+    //        var existingUserByUsername = await _userRepository.GetByUsernameAsync(request.Username);
+    //        if (existingUserByUsername != null)
+    //        {
+    //            throw new UserAlreadyExistsException(_localizerErrorMessages, "UserAlreadyExists");
+    //        }
 
-            // Check if the email is already in use
-            var existingUserByEmail = await _userRepository.GetByEmailAsync(request.Email);
-            if (existingUserByEmail != null)
-            {
-                throw new UserAlreadyExistsException("Email is already in use.");
-            }
+    //        // Check if the email is already in use
+    //        var existingUserByEmail = await _userRepository.GetByEmailAsync(request.Email);
+    //        if (existingUserByEmail != null)
+    //        {
+    //            throw new UserAlreadyExistsException(_localizerErrorMessages, "UserAlreadyExists");
+    //        }
 
-            // Create a new user
-            var user = _userFactory.CreateUser(request.Username, request.Email, request.Password);
-            await _userRepository.AddAsync(user);
+    //        // Create a new user
+    //        var user = _userFactory.CreateUser(request.Username, request.Email, request.Password, "","");
+    //        await _userRepository.AddAsync(user);
 
-            return user.UserId;
-        }
-    }
+    //        return user.UserId;
+    //    }
+    //}
 
 
     public class LoginCommandHandler : IRequestHandler<LoginCommand, UserDto>
     {
         private readonly IUserRepository _userRepository;
         private readonly IHashPasswordService _hashPasswordService;
+        private readonly IStringLocalizer<ErrorMessages> _localizerErrorMessages;
 
-        public LoginCommandHandler(IUserRepository userRepository, IHashPasswordService hashPasswordService)
+        public LoginCommandHandler(IUserRepository userRepository, IHashPasswordService hashPasswordService, IStringLocalizer<ErrorMessages> localizerErrorMessages)
         {
             _userRepository = userRepository;
             _hashPasswordService = hashPasswordService;
+            _localizerErrorMessages = localizerErrorMessages;
         }
 
         public async Task<UserDto> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.GetByUsernameAsync(request.Username);
+            var user = await _userRepository.GetByUsernameAsync(request.Username) ?? await _userRepository.GetByEmailAsync(request.Username);
             if (user == null || !_hashPasswordService.VerifyPassword(request.Password, user.PasswordHash, user.SecurityStamp))
             {
-                throw new UnauthorizedAccessException("Invalid credentials.");
+                throw new Exceptions.UnauthorizedAccessException(_localizerErrorMessages, "InvalidCredentials");
             }
 
             return new UserDto
             {
-                UserId = user.UserId,
+                UserId = user.Id,
                 Username = user.Username,
                 Email = user.Email
             };
@@ -279,36 +291,41 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
     {
         private readonly IUserRepository _userRepository;
         private readonly IJwtTokenService _jwtTokenService;
-        private readonly IEmailService _emailService;
+        private readonly IEmailSender _emailService;
         private readonly IConfiguration _configuration;
         private readonly ILogger<ForgotPasswordCommandHandler> _logger;
+        private readonly IStringLocalizer<DomainMessages> _localizer;
 
         public ForgotPasswordCommandHandler(
             IUserRepository userRepository,
             IJwtTokenService jwtTokenService,
-            IEmailService emailService,
+            IEmailSender emailService,
             IConfiguration configuration,
-            ILogger<ForgotPasswordCommandHandler> logger)
+            ILogger<ForgotPasswordCommandHandler> logger,
+            IStringLocalizer<DomainMessages> localizer)
         {
             _userRepository = userRepository;
             _jwtTokenService = jwtTokenService;
             _emailService = emailService;
             _configuration = configuration;
             _logger = logger;
+            _localizer = localizer;
         }
 
-        public async Task<Unit> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByEmailAsync(request.Email);
             if (user == null)
             {
                 _logger.LogWarning($"User with email {request.Email} not found.");
-                return Unit.Value; // Optionally, you might want to throw an exception here
+
+                throw new UserNotFoundException(request.Email, _localizer);
+
             }
 
             var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, user.UserId),
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(JwtRegisteredClaimNames.Email, user.Email)
         };
 
@@ -319,10 +336,11 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
             var resetLink = $"{issuer}/reset-password?token={token}";
 
             // Send email
-            await _emailService.SendAsync(user.Email, "Password Reset Request", $"Please reset your password using the following link: {resetLink}");
+            await _emailService.SendEmailAsync(user.Email, "Password Reset Request", $"Please reset your password using the following link: {resetLink}");
 
-            return Unit.Value;
+            
         }
+
     }
 
     public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand>
@@ -341,7 +359,7 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
             _jwtTokenService = jwtTokenService;
         }
 
-        public async Task<Unit> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             try
@@ -367,7 +385,7 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
 
                 await _userRepository.UpdateAsync(user);
 
-                return Unit.Value;
+                
             }
             catch (Exception ex)
             {
@@ -375,4 +393,31 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
             }
         }
     }
+
+
+    //public class VerifyEmailCommandHandler : IRequestHandler<VerifyEmailCommand, bool>
+    //{
+    //    private readonly IVerificationCodeService _verificationCodeService;
+    //    private readonly IUserRepository _userRepository;
+
+    //    public async Task<bool> Handle(VerifyEmailCommand request, CancellationToken cancellationToken)
+    //    {
+    //       var user = await _userRepository.GetByIdAsync(request.UserId);
+    //        // 2. Valider le code de vérification
+
+    //        //user.VerifyEmail(request.VerificationCode);
+
+    //        //bool isValid = await _verificationCodeService.ValidateVerificationCode(request.UserId, request.VerificationCode);
+    //        //if (!isValid)
+    //        //{
+    //        //    throw new Exception("Invalid verification code");
+    //        //}
+
+    //        //// 3. Marquer l'adresse email de l'utilisateur comme vérifiée dans la base de données
+    //        //await _verificationCodeService.MarkEmailAsVerified(request.UserId);
+
+    //        return true;
+    //    }
+    //}
+
 }

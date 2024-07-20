@@ -1,6 +1,6 @@
-﻿using Aiglusoft.IAM.Domain.Entities;
+﻿using Aiglusoft.IAM.Domain.Model;
 
-namespace Aiglusoft.IAM.Domain
+namespace Aiglusoft.IAM.Domain.Services
 {
     public interface IHashPasswordService
     {

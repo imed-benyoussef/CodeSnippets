@@ -1,5 +1,4 @@
 ﻿using Aiglusoft.IAM.Application.DTOs;
-using Aiglusoft.IAM.Domain.Entities;
 using MediatR;
 using System;
 
@@ -57,4 +56,6 @@ namespace Aiglusoft.IAM.Application.Commands
         public string Token { get; set; }
         public string NewPassword { get; set; }
     }
+
+
 }

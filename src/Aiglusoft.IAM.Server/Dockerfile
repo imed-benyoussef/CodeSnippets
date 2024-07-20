@@ -6,21 +6,17 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS with-node
-RUN apt-get update
-RUN apt-get install curl
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash
-RUN apt-get -y install nodejs
-RUN npm install -g @angular/cli
-
-FROM with-node AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Aiglusoft.IAM.Server/Aiglusoft.IAM.Server.csproj", "Aiglusoft.IAM.Server/"]
-COPY ["aiglusoft.iam.client/aiglusoft.iam.client.esproj", "aiglusoft.iam.client/"]
-RUN dotnet restore "./Aiglusoft.IAM.Server/Aiglusoft.IAM.Server.csproj"
+COPY ["src/Aiglusoft.IAM.Server/Aiglusoft.IAM.Server.csproj", "src/Aiglusoft.IAM.Server/"]
+COPY ["src/Aiglusoft.IAM.Application/Aiglusoft.IAM.Application.csproj", "src/Aiglusoft.IAM.Application/"]
+COPY ["src/Aiglusoft.IAM.Domain/Aiglusoft.IAM.Domain.csproj", "src/Aiglusoft.IAM.Domain/"]
+COPY ["src/Aiglusoft.IAM.Shared/Aiglusoft.IAM.Shared.csproj", "src/Aiglusoft.IAM.Shared/"]
+COPY ["src/Aiglusoft.IAM.Infrastructure/Aiglusoft.IAM.Infrastructure.csproj", "src/Aiglusoft.IAM.Infrastructure/"]
+RUN dotnet restore "./src/Aiglusoft.IAM.Server/Aiglusoft.IAM.Server.csproj"
 COPY . .
-WORKDIR "/src/Aiglusoft.IAM.Server"
+WORKDIR "/src/src/Aiglusoft.IAM.Server"
 RUN dotnet build "./Aiglusoft.IAM.Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

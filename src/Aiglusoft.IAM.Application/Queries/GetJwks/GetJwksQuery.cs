@@ -2,7 +2,7 @@
 using Aiglusoft.IAM.Domain.Services;
 using System.Threading;
 using System.Threading.Tasks;
-using Aiglusoft.IAM.Domain;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Aiglusoft.IAM.Application.Queries.GetJwks
 {

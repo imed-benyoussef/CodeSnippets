@@ -1,4 +1,8 @@
-﻿using Aiglusoft.IAM.Domain.Entities;
+﻿using Aiglusoft.IAM.Domain.Model;
+using Aiglusoft.IAM.Domain.Model.AuthorizationAggregates;
+using Aiglusoft.IAM.Domain.Model.ClientAggregates;
+using Aiglusoft.IAM.Domain.Model.TokenAggregate;
+using Aiglusoft.IAM.Domain.Model.UserAggregates;
 using System.Threading.Tasks;
 
 namespace Aiglusoft.IAM.Domain.Repositories
@@ -10,6 +14,7 @@ namespace Aiglusoft.IAM.Domain.Repositories
         Task<User> GetByEmailAsync(string email);
         Task AddAsync(User user);
         Task UpdateAsync(User user);
+        Task<bool> IsUsernameTakenAsync(string username);
     }
 
     public interface IClientRepository

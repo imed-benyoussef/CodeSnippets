@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System;
 
-namespace Aiglusoft.IAM.Domain
+namespace Aiglusoft.IAM.Domain.Services
 {
     public interface ICertificateService
     {

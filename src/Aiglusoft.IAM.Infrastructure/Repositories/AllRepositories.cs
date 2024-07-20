@@ -1,4 +1,8 @@
-﻿using Aiglusoft.IAM.Domain.Entities;
+﻿using Aiglusoft.IAM.Domain.Model;
+using Aiglusoft.IAM.Domain.Model.AuthorizationAggregates;
+using Aiglusoft.IAM.Domain.Model.ClientAggregates;
+using Aiglusoft.IAM.Domain.Model.TokenAggregate;
+using Aiglusoft.IAM.Domain.Model.UserAggregates;
 using Aiglusoft.IAM.Domain.Repositories;
 using Aiglusoft.IAM.Infrastructure.Persistence.DbContexts;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +23,7 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
         {
             return await _context.Users
                                  .Include(u => u.Claims)
-                                 .FirstOrDefaultAsync(u => u.UserId == userId);
+                                 .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         public async Task<User> GetByUsernameAsync(string username)
@@ -35,13 +39,18 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
         public async Task AddAsync(User user)
         {
             await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            await _context.SaveEntitiesAsync();
         }
 
         public async Task UpdateAsync(User user)
         {
             _context.Users.Update(user);
-            await _context.SaveChangesAsync();
+            await _context.SaveEntitiesAsync();
+        }
+
+        public Task<bool> IsUsernameTakenAsync(string username)
+        {
+          return _context.Users.AnyAsync(e=>e.Username.ToLower() == username.ToLower());
         }
     }
 
@@ -66,19 +75,19 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
         public async Task AddAsync(Client client)
         {
             await _context.Clients.AddAsync(client);
-            await _context.SaveChangesAsync();
+            await _context.SaveEntitiesAsync();
         }
 
         public async Task UpdateAsync(Client client)
         {
             _context.Clients.Update(client);
-            await _context.SaveChangesAsync();
+            await _context.SaveEntitiesAsync();
         }
 
         public async Task DeleteAsync(Client client)
         {
             _context.Clients.Remove(client);
-            await _context.SaveChangesAsync();
+            await _context.SaveEntitiesAsync();
         }
     }
 
@@ -102,7 +111,7 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
         public async Task AddAsync(AuthorizationCode authorizationCode)
         {
             await _context.AuthorizationCodes.AddAsync(authorizationCode);
-            await _context.SaveChangesAsync();
+            await _context.SaveEntitiesAsync();
         }
     }
 
@@ -126,13 +135,14 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
         public async Task AddAsync(Token token)
         {
             await _context.Tokens.AddAsync(token);
-            await _context.SaveChangesAsync();
+            await _context.SaveEntitiesAsync();
         }
 
         public async Task UpdateAsync(Token token)
         {
             _context.Tokens.Update(token);
-            await _context.SaveChangesAsync();
+            await _context.SaveEntitiesAsync();
         }
     }
+
 }

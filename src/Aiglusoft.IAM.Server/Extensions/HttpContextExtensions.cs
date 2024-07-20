@@ -3,11 +3,24 @@ using Aiglusoft.IAM.Application.Extentions;
 using Aiglusoft.IAM.Server.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http.Extensions;
+using System.Security.Claims;
 
 namespace Aiglusoft.IAM.Server.Extensions
 {
     public static class HttpContextExtensions
     {
+        public static string GetUserId(this HttpContext context)
+        {
+            if (context.User == null)
+            {
+                throw new InvalidOperationException("HttpContext has no User.");
+            }
+
+            var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier);
+
+            return userIdClaim?.Value ?? throw new InvalidOperationException("User ID claim not found.");
+        }
+
         public static OidcServerRequest GetOidcServerRequest(this HttpContext context)
         {
             var request = new OidcServerRequest();

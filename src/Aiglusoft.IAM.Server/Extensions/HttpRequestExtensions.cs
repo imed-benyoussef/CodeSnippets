@@ -9,6 +9,4 @@ namespace Aiglusoft.IAM.Server.Extensions
       
     }
 
-
-
 }

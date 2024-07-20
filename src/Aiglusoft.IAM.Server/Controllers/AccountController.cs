@@ -7,55 +7,37 @@ using Aiglusoft.IAM.Application.Commands;
 using Microsoft.AspNetCore.Authorization;
 using MediatR;
 using Microsoft.IdentityModel.Tokens;
+using Asp.Versioning;
+using Aiglusoft.IAM.Domain;
 
 namespace Aiglusoft.IAM.Server.Controllers
 {
+    [Authorize]
+    [ApiVersion(1.0)]
     [ApiController]
-    [Route("api/v1/account")]
+    [Route("api/v{version:apiVersion}/account")]
     public class AccountController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IRootContext _rootContext;
 
-        public AccountController(IMediator mediator)
+        public AccountController(IMediator mediator, IRootContext rootContext)
         {
             _mediator = mediator;
+            _rootContext = rootContext;
         }
 
-        [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
+        [HttpGet("login")]
+        public async Task<IActionResult> Login()
         {
-            if (command == null)
+            var userId = await _rootContext.GetUserIdAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (string.IsNullOrEmpty(userId))
             {
-                return BadRequest(new ErrorResponse
-                {
-                    Error = "invalid_request",
-                    ErrorDescription = "Request body is missing."
-                });
+                return Unauthorized();
             }
 
-            if (string.IsNullOrEmpty(command.Username) || string.IsNullOrEmpty(command.Email) || string.IsNullOrEmpty(command.Password))
-            {
-                return BadRequest(new ErrorResponse
-                {
-                    Error = "invalid_request",
-                    ErrorDescription = "Username, email or password is missing."
-                });
-            }
-
-            try
-            {
-                var userId = await _mediator.Send(command);
-                return Ok(new { UserId = userId });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ErrorResponse
-                {
-                    Error = "registration_failed",
-                    ErrorDescription = ex.Message
-                });
-            }
+            return Ok(new { message = "You are logged in!" });
         }
 
         [HttpPost("login")]
@@ -71,49 +53,31 @@ namespace Aiglusoft.IAM.Server.Controllers
                 });
             }
 
-            if (string.IsNullOrEmpty(loginModel.Username) || string.IsNullOrEmpty(loginModel.Password))
-            {
-                return BadRequest(new ErrorResponse
-                {
-                    Error = "invalid_request",
-                    ErrorDescription = "Username or password is missing."
-                });
-            }
-
             var command = new LoginCommand
             {
                 Username = loginModel.Username,
                 Password = loginModel.Password
             };
 
-            try
-            {
-                var user = await _mediator.Send(command);
 
-                var claims = new List<Claim>
+            var user = await _mediator.Send(command);
+
+            var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.Username),
                     new Claim(ClaimTypes.NameIdentifier, user.UserId),
                     new Claim(ClaimTypes.Email, user.Email)
                 };
 
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties
-                {
-                    IsPersistent = loginModel.RememberMe
-                };
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-                return Ok(new { Message = "Login successful" });
-            }
-            catch (UnauthorizedAccessException)
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
             {
-                return Unauthorized(new ErrorResponse
-                {
-                    Error = "invalid_credentials",
-                    ErrorDescription = "The username or password is incorrect."
-                });
-            }
+                IsPersistent = loginModel.RememberMe
+            };
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+            return Ok(new { Message = "Login successful" });
+
         }
 
         [HttpPost("logout")]
@@ -123,6 +87,7 @@ namespace Aiglusoft.IAM.Server.Controllers
             return Ok(new { Message = "Logout successful" });
         }
 
+        [AllowAnonymous]
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
         {
@@ -137,6 +102,7 @@ namespace Aiglusoft.IAM.Server.Controllers
             return Ok(new { message = "Password reset email sent." });
         }
 
+        [AllowAnonymous]
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
         {

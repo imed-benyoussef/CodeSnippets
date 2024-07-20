@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  aiglusoft.iam.server:
+    image: ${DOCKER_REGISTRY-aiglusoft/}aiglusoft-iam
+    build:
+      context: .
+      dockerfile: src/Aiglusoft.IAM.Server/Dockerfile
+
+volumes:
+  postgres_data:

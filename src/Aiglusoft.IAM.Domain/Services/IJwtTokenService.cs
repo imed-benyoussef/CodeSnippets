@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Aiglusoft.IAM.Infrastructure.Services
+namespace Aiglusoft.IAM.Domain.Services
 {
     public interface IJwtTokenService
     {

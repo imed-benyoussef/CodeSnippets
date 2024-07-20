@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
-using Aiglusoft.IAM.Domain;
+using Aiglusoft.IAM.Domain.Services;
 
 namespace Aiglusoft.IAM.Infrastructure.Services
 {

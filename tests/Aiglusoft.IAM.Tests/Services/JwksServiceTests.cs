@@ -4,9 +4,9 @@ namespace Aiglusoft.IAM.Tests.Services
     using Xunit;
     using Moq;
     using Aiglusoft.IAM.Infrastructure.Services;
-    using Aiglusoft.IAM.Domain;
     using Microsoft.IdentityModel.Tokens;
     using System.Security.Cryptography;
+    using Aiglusoft.IAM.Domain.Services;
 
     public class JwksServiceTests
     {

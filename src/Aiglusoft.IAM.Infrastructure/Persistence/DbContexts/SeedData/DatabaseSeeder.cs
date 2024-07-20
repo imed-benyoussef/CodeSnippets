@@ -1,5 +1,5 @@
 ﻿using Aiglusoft.IAM.Infrastructure.Persistence.DbContexts;
-using Aiglusoft.IAM.Domain.Entities;
+using Aiglusoft.IAM.Domain.Model;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -8,14 +8,16 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Aiglusoft.IAM.Domain;
 using Aiglusoft.IAM.Domain.Factories;
+using Aiglusoft.IAM.Domain.Model.ClientAggregates;
+using Aiglusoft.IAM.Infrastructure.Factories;
 
 namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.SeedData
 {
-    public class DatabaseSeeder : IHostedService
+    public class DatabaseSeederForTests : IHostedService
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public DatabaseSeeder(IServiceProvider serviceProvider)
+        public DatabaseSeederForTests(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
@@ -26,9 +28,34 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.SeedData
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
 
+
+            try
+            {
+                context.Database.EnsureCreated();
+                if (context.Database.GetPendingMigrations().Any())
+                {
+                    context.Database.Migrate();
+                }
+
+                await Seed(context, userFactory);
+
+            }
+            catch (Exception ex)
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+                await Seed(context, userFactory);
+            }
+        }
+
+        async Task Seed(AppDbContext context, IUserFactory userFactory)
+        {
             await SeedUsers(context, userFactory);
 
             await SeedClients(context);
+
+            var codeValidators = context.CodeValidators.Take(1);
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
@@ -48,17 +75,17 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.SeedData
                 context.Clients.Add(client);
                 await context.SaveChangesAsync();
 
-                foreach (var redirectUri in client.RedirectUris)
+                foreach (var redirectUri in client.RedirectUris.ToArray())
                 {
                     context.ClientRedirectUris.Add(new ClientRedirectUri(client, redirectUri.RedirectUri));
                 }
 
-                foreach (var scope in client.Scopes)
+                foreach (var scope in client.Scopes.ToArray())
                 {
                     context.ClientScopes.Add(new ClientScope(client, scope.Scope));
                 }
 
-                foreach (var grantType in client.GrantTypes)
+                foreach (var grantType in client.GrantTypes.ToArray())
                 {
                     context.ClientGrantTypes.Add(new ClientGrantType(client, grantType.GrantType));
                 }
@@ -71,8 +98,8 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.SeedData
         {
             if (!context.Users.Any())
             {
-                var user = userFactory.CreateUser("testuser", "testuser@example.com", "password");
-                user.VerifyEmail();
+                var user = userFactory.CreateUser("testuser", "testuser@example.com", "password", "", "", DateOnly.MinValue, null);
+                //user.VerifyEmail();
                 context.Users.Add(user);
                 await context.SaveChangesAsync();
             }

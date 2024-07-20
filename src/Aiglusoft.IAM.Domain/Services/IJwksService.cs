@@ -1,7 +1,9 @@
-﻿using Aiglusoft.IAM.Domain;
-using Aiglusoft.IAM.Domain.Services;
+﻿//using Microsoft.IdentityModel.Tokens;
+//using System.Security.Cryptography;
+//using System.Text.Json;
 
-namespace Aiglusoft.IAM.Infrastructure.Services
+using Microsoft.IdentityModel.Tokens;
+namespace Aiglusoft.IAM.Domain.Services
 {
     public interface IJwksService
     {

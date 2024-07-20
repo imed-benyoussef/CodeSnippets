@@ -966,7 +966,7 @@
             <line number="21" hits="2" branch="False" />
           </lines>
         </class>
-        <class name="Aiglusoft.IAM.Domain.Entities.AuthorizationCode" filename="Aiglusoft.IAM.Domain\Entities\AuthorizationCode.cs" line-rate="1" branch-rate="1" complexity="5">
+        <class name="Aiglusoft.IAM.Domain.Model.AuthorizationCode" filename="Aiglusoft.IAM.Domain\Entities\AuthorizationCode.cs" line-rate="1" branch-rate="1" complexity="5">
           <methods>
             <method name="get_Code" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -1012,7 +1012,7 @@
             <line number="14" hits="3" branch="False" />
           </lines>
         </class>
-        <class name="Aiglusoft.IAM.Domain.Entities.User" filename="Aiglusoft.IAM.Domain\Entities\User.cs" line-rate="1" branch-rate="1" complexity="4">
+        <class name="Aiglusoft.IAM.Domain.Model.User" filename="Aiglusoft.IAM.Domain\Entities\User.cs" line-rate="1" branch-rate="1" complexity="4">
           <methods>
             <method name="get_Id" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -1342,7 +1342,7 @@
         </class>
         <class name="Aiglusoft.IAM.Infrastructure.Repositories.AuthorizationCodeRepository" filename="Aiglusoft.IAM.Infrastructure\Repositories\AuthorizationCodeRepository.cs" line-rate="0" branch-rate="1" complexity="3">
           <methods>
-            <method name="SaveAsync" signature="(Aiglusoft.IAM.Domain.Entities.AuthorizationCode,System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="SaveAsync" signature="(Aiglusoft.IAM.Domain.Model.AuthorizationCode,System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
               <lines>
                 <line number="12" hits="0" branch="False" />
                 <line number="13" hits="0" branch="False" />
@@ -1378,7 +1378,7 @@
         </class>
         <class name="Aiglusoft.IAM.Infrastructure.Repositories.UserRepository" filename="Aiglusoft.IAM.Infrastructure\Repositories\UserRepository.cs" line-rate="0.5555" branch-rate="1" complexity="3">
           <methods>
-            <method name="AddAsync" signature="(Aiglusoft.IAM.Domain.Entities.User)" line-rate="1" branch-rate="1" complexity="1">
+            <method name="AddAsync" signature="(Aiglusoft.IAM.Domain.Model.User)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
                 <line number="16" hits="1" branch="False" />
                 <line number="17" hits="1" branch="False" />

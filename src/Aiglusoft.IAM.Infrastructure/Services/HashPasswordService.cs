@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Security.Cryptography;
-using Aiglusoft.IAM.Domain;
 using Aiglusoft.IAM.Domain.Services;
 
 namespace Aiglusoft.IAM.Infrastructure.Services

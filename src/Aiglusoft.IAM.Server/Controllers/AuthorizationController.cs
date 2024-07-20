@@ -5,6 +5,7 @@ using Aiglusoft.IAM.Application.Exceptions;
 using Aiglusoft.IAM.Domain;
 using Aiglusoft.IAM.Server.Extensions;
 using Aiglusoft.IAM.Server.Models;
+using Asp.Versioning;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
@@ -13,6 +14,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Aiglusoft.IAM.Server.Controllers
 {
+
+    [ApiVersionNeutral]
     [ApiController]
     [Route("connect")]
     public class AuthorizationController : ControllerBase
@@ -29,6 +32,7 @@ namespace Aiglusoft.IAM.Server.Controllers
         [HttpGet("authorize")]
         public async Task<IActionResult> Authorize()
         {
+            var auth = User.Identity.IsAuthenticated;
             // Check if the user is authenticated
             var userId = await _rootContext.GetUserIdAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             if (string.IsNullOrEmpty(userId))
@@ -78,7 +82,7 @@ namespace Aiglusoft.IAM.Server.Controllers
                     error_description = ex.Errors.FirstOrDefault()?.ErrorMessage ?? "Invalid request parameters."
                 });
             }
-            catch (UnauthorizedAccessException ex)
+            catch (System.UnauthorizedAccessException ex)
             {
                 var errorParts = ex.Message.Split(": ");
                 return Unauthorized(new
@@ -134,7 +138,7 @@ namespace Aiglusoft.IAM.Server.Controllers
                     error_description = ex.Errors.FirstOrDefault()?.ErrorMessage ?? "Invalid request parameters."
                 });
             }
-            catch (UnauthorizedAccessException ex)
+            catch (System.UnauthorizedAccessException ex)
             {
                 var errorParts = ex.Message.Split(": ");
                 return Unauthorized(new

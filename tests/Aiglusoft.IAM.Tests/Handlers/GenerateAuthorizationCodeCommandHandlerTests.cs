@@ -1,4 +1,4 @@
-﻿//using Aiglusoft.IAM.Domain.Entities;
+﻿//using Aiglusoft.IAM.Domain.Model;
 //using Aiglusoft.IAM.Domain.Repositories;
 
 //namespace Aiglusoft.IAM.Tests.Handlers

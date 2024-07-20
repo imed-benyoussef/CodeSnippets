@@ -1,5 +1,7 @@
 ﻿using Aiglusoft.IAM.Application.Commands;
 using FluentValidation;
+using Microsoft.Extensions.Localization;
+using System.Resources;
 
 namespace Aiglusoft.IAM.Application.Validators
 {
@@ -70,4 +72,28 @@ namespace Aiglusoft.IAM.Application.Validators
             return string.IsNullOrEmpty(maxAge) || int.TryParse(maxAge, out _);
         }
     }
+
+    public class ForgotPasswordCommandValidator : AbstractValidator<ForgotPasswordCommand>
+    {
+        public ForgotPasswordCommandValidator(IStringLocalizer<ErrorMessages> localizer)
+        {
+            RuleFor(x => x.Email)
+                .NotEmpty().WithMessage(localizer["EmailRequired"]).WithErrorCode("EmailRequired")
+                .EmailAddress().WithMessage(localizer["InvalidEmail"]).WithErrorCode("InvalidEmail");
+        }
+    }
+
+    public class LoginCommandValidator : AbstractValidator<LoginCommand>
+    {
+        public LoginCommandValidator(IStringLocalizer<ErrorMessages> localizer)
+        {
+            RuleFor(x => x.Username)
+                .NotEmpty().WithMessage(localizer["UsernameRequired"]).WithErrorCode("UsernameRequired");
+
+            RuleFor(x => x.Password)
+                .NotEmpty().WithMessage(localizer["PasswordRequired"]).WithErrorCode("PasswordRequired");
+        }
+    }
+
+
 }

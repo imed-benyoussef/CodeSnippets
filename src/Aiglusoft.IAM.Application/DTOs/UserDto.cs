@@ -22,4 +22,49 @@ namespace Aiglusoft.IAM.Application.DTOs
         public string RefreshToken { get; set; } // Optional
     }
 
+
+    public class UserNamesDto
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+
+    public class GeneralInfoDto
+    {
+        public DateTime DateOfBirth { get; set; }
+        public string Gender { get; set; }
+    }
+
+    public class EmailDto
+    {
+        public string Email { get; set; }
+    }
+
+    public class VerifyEmailDto
+    {
+        public string Code { get; set; }
+    }
+
+    public class PasswordDto
+    {
+        public string Password { get; set; }
+        public string ConfirmPassword { get; set; }
+    }
+
+    public class PhoneDto
+    {
+        public string PhoneNumber { get; set; }
+    }
+
+    public class VerifyPhoneDto
+    {
+        public string Code { get; set; }
+    }
+
+    public class TermsAcceptanceDto
+    {
+        public bool Accepted { get; set; }
+    }
+
+
 }

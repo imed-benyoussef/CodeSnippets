@@ -1,7 +1,7 @@
 ﻿//using Aiglusoft.IAM.Application.Commands;
 //using Aiglusoft.IAM.Application.Commands.Handlers;
 //using Aiglusoft.IAM.Application.UseCases.Users.CreateUser;
-//using Aiglusoft.IAM.Domain.Entities;
+//using Aiglusoft.IAM.Domain.Model;
 //using Aiglusoft.IAM.Domain.Repositories;
 //using Moq;
 

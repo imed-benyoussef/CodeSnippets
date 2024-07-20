@@ -1,6 +1,6 @@
 ﻿using MediatR;
-using Aiglusoft.IAM.Infrastructure.Services;
-using Aiglusoft.IAM.Domain;
+using Aiglusoft.IAM.Domain.Services;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Aiglusoft.IAM.Application.Queries.GetJwks
 {

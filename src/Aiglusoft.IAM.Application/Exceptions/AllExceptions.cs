@@ -1,61 +1,92 @@
 ﻿using System;
+using System.Globalization;
+using Aiglusoft.IAM.Domain;
+using Aiglusoft.IAM.Domain.Exceptions;
 using Aiglusoft.IAM.Shared.Utilities;
+using Microsoft.Extensions.Localization;
 
 namespace Aiglusoft.IAM.Application.Exceptions
 {
     public class AppException : Exception
     {
-        public string Code { get; }
+        public virtual string? Code { get; }
 
-        public AppException( string message) : base(message)
+        public AppException()
         {
-            Code = GenerateCodeFromClassName();
+
+        }
+
+        public AppException(string message) : base(message)
+        {
         }
         public AppException(string code, string message) : base(message)
         {
-            Code = string.IsNullOrEmpty(code) ? GenerateCodeFromClassName() : code;
+            Code = code;
         }
 
-        public AppException(string code, string message, Exception innerException) : base(message, innerException)
+        public AppException(IStringLocalizer localizer, string resourceKey, params object[] args)
+        : this(string.Format(localizer[resourceKey], args))
         {
-            Code = string.IsNullOrEmpty(code) ? GenerateCodeFromClassName() : code;
+
         }
 
-        private string GenerateCodeFromClassName()
+        public AppException(string code, IStringLocalizer localizer, string resourceKey, params object[] args)
+        : this(code, string.Format(localizer[resourceKey], args))
         {
-            var className = GetType().Name;
-            if (className.EndsWith("Exception"))
-            {
-                className = className.Substring(0, className.Length - "Exception".Length);
-            }
-            return className.ToSnakeCase();
+
         }
+
     }
 
     public class InvalidRequestException : AppException
     {
-        public InvalidRequestException(string message) : base(null, message) { }
+        public InvalidRequestException(IStringLocalizer localizer, string resourceKey, params object[] args) : base(localizer, resourceKey, args)
+        {
+        }
     }
 
     public class InvalidClientException : AppException
     {
-        public InvalidClientException(string message) : base(null, message) { }
+        public InvalidClientException(IStringLocalizer localizer, string resourceKey, params object[] args) : base(localizer, resourceKey, args)
+        {
+        }
     }
 
     public class InvalidRedirectUriException : AppException
     {
-        public InvalidRedirectUriException(string message) : base(null, message) { }
+        public InvalidRedirectUriException(IStringLocalizer localizer, string resourceKey, params object[] args) : base(localizer, resourceKey, args)
+        {
+        }
     }
 
     public class UnsupportedResponseTypeException : AppException
     {
-        public UnsupportedResponseTypeException(string message) : base(null, message) { }
+        public UnsupportedResponseTypeException(IStringLocalizer localizer, string resourceKey, params object[] args) : base(localizer, resourceKey, args)
+        {
+        }
     }
 
     public class UserAlreadyExistsException : AppException
     {
-        public UserAlreadyExistsException(string message) : base(message)
+        public UserAlreadyExistsException(IStringLocalizer localizer, string resourceKey, params object[] args) : base(localizer, resourceKey, args)
         {
         }
     }
+
+    public class UnauthorizedAccessException : AppException
+    {
+        public UnauthorizedAccessException(IStringLocalizer localizer, string resourceKey, params object[] args) : base(localizer, resourceKey, args)
+        {
+        }
+    }
+
+
+    public class InvalidVerificationCodeException : AppException
+    {
+        public InvalidVerificationCodeException(IStringLocalizer localizer, string resourceKey, params object[] args) : base(localizer, resourceKey, args)
+        {
+        }
+    }
+
+
 }

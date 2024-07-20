@@ -9,7 +9,4 @@ namespace Aiglusoft.IAM.Application
     public static class DependencyInjection
     {
     }
-    public  class ApplicationLayer
-    {
-    }
 }
