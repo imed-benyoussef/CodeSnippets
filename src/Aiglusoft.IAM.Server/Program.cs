@@ -20,6 +20,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -134,6 +135,9 @@ services.AddDbContext<AppDbContext>(options =>
 
 services.AddScoped<IUnitOfWork, AppDbContext>();
 
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<AppDbContext>();
+
 services.AddScoped<IUserRepository, UserRepository>();
 services.AddScoped<IClientRepository, ClientRepository>();
 services.AddScoped<IAuthorizationCodeRepository, AuthorizationCodeRepository>();
@@ -219,20 +223,22 @@ app.UseSwagger();
 if (app.Environment.IsDevelopment())
 {
   app.UseDeveloperExceptionPage();
-  app.UseSwaggerUI(
-     options =>
-     {
-       var descriptions = app.DescribeApiVersions();
 
-       // build a swagger endpoint for each discovered API version
-       foreach (var description in descriptions)
-       {
-         var url = $"/swagger/{description.GroupName}/swagger.json";
-         var name = description.GroupName.ToUpperInvariant();
-         options.SwaggerEndpoint(url, name);
-       }
-     });
 }
+app.UseSwaggerUI(
+    options =>
+    {
+      var descriptions = app.DescribeApiVersions();
+
+      // build a swagger endpoint for each discovered API version
+      foreach (var description in descriptions)
+      {
+        var url = $"/swagger/{description.GroupName}/swagger.json";
+        var name = description.GroupName.ToUpperInvariant();
+        options.SwaggerEndpoint(url, name);
+      }
+    });
+
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
