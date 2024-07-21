@@ -1,0 +1,48 @@
+# base-pipeline.yml
+
+parameters:
+  - name: appName
+    type: string
+  - name: appPath
+    type: string
+  - name: nodeVersion
+    type: string
+  - name: dockerRegistryServiceConnection
+    type: string
+  - name: dockerRegistry
+    type: string
+
+    
+trigger:
+  batch: true
+  branches:
+    include:
+      - develop
+      - master
+      - release/*
+
+
+variables:
+  buildConfiguration: 'Release'
+  dockerRegistryServiceConnection: ${{ parameters.dockerRegistryServiceConnection }}
+  nodeVersion: ${{ parameters.nodeVersion }}
+  npmRegistry: 'https://pkgs.dev.azure.com/aiglusoft/_packaging/aiglusoft_npm_packages/npm/registry/'
+  npmToken: '$(System.AccessToken)'  # Use the system access token for authentication
+  dockerRegistry: ${{ parameters.dockerRegistry }}
+
+stages:
+- stage: CalculateVersionStage
+  displayName: GitVersion v5 (cross stage)
+  jobs:
+    - template: templates/gitversion.yml
+
+- stage: BuildApp
+  displayName: Build Application Stage
+  dependsOn: CalculateVersionStage
+  jobs:
+    - template: templates/build-app.yml
+      parameters:
+        app: ${{ parameters.appName }}
+        nodeVersion: ${{ parameters.nodeVersion }}
+        dockerRegistryServiceConnection: ${{ parameters.dockerRegistryServiceConnection }}
+        dockerRegistry: ${{ parameters.dockerRegistry }}
