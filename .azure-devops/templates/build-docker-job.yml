@@ -1,0 +1,70 @@
+parameters:
+  solution: '**/Aiglusoft.IAM.sln'
+  buildConfiguration: 'Release'
+  coberturaOutputFormat: '/p:CoverletOutputFormat=cobertura'
+  coverageDirectory: '$(Build.ArtifactStagingDirectory)/coverage/'
+
+steps:
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK 8.x'
+    inputs:
+      packageType: 'sdk'
+      version: '8.x'
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore NuGet Packages'
+    inputs:
+      command: 'restore'
+      projects: ${{ parameters.solution }}
+
+  - script: |
+      find . -type f -name "*.esproj" -exec rm -f {} +
+    displayName: 'Remove .esproj files from solution'
+    continueOnError: true
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build Solution'
+    inputs:
+      command: 'build'
+      projects: ${{ parameters.solution }}
+      arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Run unit tests'
+    inputs:
+      command: 'test'
+      projects: 'tests/Aiglusoft.IAM.Tests/*.csproj'
+      arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore ${{ parameters.coberturaOutputFormat }} /p:CollectCoverage=true /p:CoverletOutput=${{ parameters.coverageDirectory }}Aiglusoft.IAM.Tests/'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Run end-to-end tests'
+    inputs:
+      command: 'test'
+      projects: 'tests/Aiglusoft.IAM.E2ETests/*.csproj'
+      arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore ${{ parameters.coberturaOutputFormat }} /p:CollectCoverage=true /p:CoverletOutput=${{ parameters.coverageDirectory }}Aiglusoft.IAM.E2ETests/'
+    continueOnError: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish build artifacts'
+    inputs:
+      pathToPublish: ${{ parameters.coverageDirectory }}
+      artifactName: 'coverage'
+      publishLocation: 'Container'
+    continueOnError: true
+
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish code coverage results'
+    inputs:
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: '${{ parameters.coverageDirectory }}/**/coverage.cobertura.xml'
+      reportDirectory: ${{ parameters.coverageDirectory }}
+      failIfCoverageEmpty: true
+    continueOnError: true
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Publish Web Projects'
+    inputs:
+      command: 'publish'
+      publishWebProjects: true
+      arguments: '--configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)'

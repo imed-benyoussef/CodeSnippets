@@ -1,48 +1,220 @@
-# base-pipeline.yml
-
 parameters:
-  - name: appName
-    type: string
-  - name: appPath
-    type: string
   - name: nodeVersion
+    type: string
+  - name: app
+    type: string
+  - name: angularAppPath
+    type: string
+  - name: dockerfilePath
     type: string
   - name: dockerRegistryServiceConnection
     type: string
-  - name: dockerRegistry
+  - name: npmFeed
     type: string
+    default: 'aiglusoft_npm_packages'
+  - name: dockerRepository
+    type: string
+  - name: angularArtifactName
+    type: string
+  - name: projectPath
+    type: string
+  - name: buildConfiguration
+    type: string
+    default: 'Release'
+  - name: coberturaOutputFormat
+    type: string
+    default: '/p:CoverletOutputFormat=cobertura'
+  - name: coverageDirectory
+    type: string
+    default: '$(Build.ArtifactStagingDirectory)/coverage/'
+  - name: unitTestPath
+    type: string
+    default: ''
+  - name: e2eTestPath
+    type: string
+    default: ''
 
-    
-trigger:
-  batch: true
-  branches:
-    include:
-      - develop
-      - master
-      - release/*
 
-
-variables:
-  buildConfiguration: 'Release'
-  dockerRegistryServiceConnection: ${{ parameters.dockerRegistryServiceConnection }}
-  nodeVersion: ${{ parameters.nodeVersion }}
-  npmRegistry: 'https://pkgs.dev.azure.com/aiglusoft/_packaging/aiglusoft_npm_packages/npm/registry/'
-  npmToken: '$(System.AccessToken)'  # Use the system access token for authentication
-  dockerRegistry: ${{ parameters.dockerRegistry }}
 
 stages:
-- stage: CalculateVersionStage
-  displayName: GitVersion v5 (cross stage)
+- stage: GitVersion_v5_cross_stage
+  displayName: 'Calculate GitVersion'
   jobs:
-    - template: templates/gitversion.yml
+  - job: GitVersion_v5_cross_stage_producer
+    displayName: 'Calculate Version'
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - checkout: self
+      fetchDepth: 0
 
-- stage: BuildApp
-  displayName: Build Application Stage
-  dependsOn: CalculateVersionStage
+    - task: gitversion/setup@1.2.0
+      displayName: Install GitVersion
+      inputs:
+        versionSpec: '5.x'
+
+    - task: gitversion/execute@1.2.0
+      displayName: Determine Version
+      name: version_step # step id used as reference for output values
+      inputs:
+        useConfigFile: true
+        configFilePath: 'VersionConfig.yml'
+
+- stage: BuildAngular
+  displayName: 'Build Angular'
   jobs:
-    - template: templates/build-app.yml
-      parameters:
-        app: ${{ parameters.appName }}
-        nodeVersion: ${{ parameters.nodeVersion }}
-        dockerRegistryServiceConnection: ${{ parameters.dockerRegistryServiceConnection }}
-        dockerRegistry: ${{ parameters.dockerRegistry }}
+  - job: Build
+    displayName: 'Build Angular'
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - checkout: self
+      persistCredentials: true
+      clean: true
+      fetchDepth: 0
+    - task: UseNode@1
+      inputs:
+        version: ${{ parameters.nodeVersion }}
+      displayName: 'Install Node.js ${{ parameters.nodeVersion }}'
+    - script: |
+        npm install -g @angular/cli@18
+      displayName: 'Install Angular CLI'
+    - task: Npm@1
+      inputs:
+        command: 'custom'
+        workingDir: '${{ parameters.angularAppPath }}'
+        customCommand: 'install --legacy-peer-deps'
+        customRegistry: 'useFeed'
+        customFeed: '${{ parameters.npmFeed }}'
+      displayName: 'Install dependencies: ${{ parameters.app }}'
+
+    - task: Npm@1
+      inputs:
+        command: 'custom'
+        workingDir: '${{ parameters.angularAppPath }}'
+        customCommand: 'run build -- --configuration production --output-path dist/${{ parameters.app }}'
+        customRegistry: 'useFeed'
+        customFeed: '${{ parameters.npmFeed }}'
+      displayName: 'build: ${{ parameters.app }}'
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Artifact: ${{ parameters.angularArtifactName }}'
+      inputs:
+        targetPath: ${{ parameters.angularAppPath }}/dist/${{ parameters.app }}
+        artifact: ${{ parameters.angularArtifactName }}
+        publishLocation: 'pipeline'
+
+- stage: BuildDotNet
+  displayName: 'Build .NET'
+  jobs:
+  - job: BuildAndTest
+    displayName: 'Build and Test .NET Solution'
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - checkout: self
+      persistCredentials: true
+      clean: true
+      fetchDepth: 0
+    - task: UseDotNet@2
+      displayName: 'Install .NET SDK 8.x'
+      inputs:
+        packageType: 'sdk'
+        version: '8.x'
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore NuGet Packages'
+      inputs:
+        command: 'restore'
+        projects: ${{ parameters.projectPath }}
+    - script: |
+        find . -type f -name "*.esproj" -exec rm -f {} +
+      displayName: 'Remove .esproj files from solution'
+      continueOnError: true
+    - task: DotNetCoreCLI@2
+      displayName: 'Build Solution'
+      inputs:
+        command: 'build'
+        projects: ${{ parameters.projectPath }}
+        arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore'
+    - ${{ if parameters.unitTestPath }}:
+      - task: DotNetCoreCLI@2
+        displayName: 'Run unit tests'
+        inputs:
+          command: 'test'
+          projects: ${{ parameters.unitTestPath }}
+          arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore ${{ parameters.coberturaOutputFormat }} /p:CollectCoverage=true /p:CoverletOutput=${{ parameters.coverageDirectory }}UnitTests/'
+    - ${{ if parameters.e2eTestPath }}:
+      - task: DotNetCoreCLI@2
+        displayName: 'Run end-to-end tests'
+        inputs:
+          command: 'test'
+          projects: ${{ parameters.e2eTestPath }}
+          arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore ${{ parameters.coberturaOutputFormat }} /p:CollectCoverage=true /p:CoverletOutput=${{ parameters.coverageDirectory }}E2ETests/'
+        continueOnError: true
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish build artifacts'
+      inputs:
+        pathToPublish: ${{ parameters.coverageDirectory }}
+        artifactName: 'coverage'
+        publishLocation: 'Container'
+      continueOnError: true
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish code coverage results'
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '${{ parameters.coverageDirectory }}/**/coverage.cobertura.xml'
+        reportDirectory: ${{ parameters.coverageDirectory }}
+        failIfCoverageEmpty: true
+      continueOnError: true
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish Web Projects'
+      inputs:
+        command: 'publish'
+        publishWebProjects: true
+        arguments: '--configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)'
+
+- stage: BuildAndPushDocker
+  displayName: 'Build and Push Docker'
+  dependsOn:
+    - GitVersion_v5_cross_stage
+    - BuildAngular
+    - BuildDotNet
+  jobs:
+  - job: BuildAndPush
+    displayName: 'Build and Push'
+    pool:
+      vmImage: $(vmImageName)
+    variables:
+      fullSemVer: $[ stageDependencies.GitVersion_v5_cross_stage.GitVersion_v5_cross_stage_producer.outputs['version_step.fullSemVer'] ]
+      semVer: $[ stageDependencies.GitVersion_v5_cross_stage.GitVersion_v5_cross_stage_producer.outputs['version_step.semVer'] ]
+      dockerRepository: '${{ parameters.dockerRepository }}/${{ parameters.app }}:$(semVer)'
+    steps:
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download Artifact: ${{ parameters.angularArtifactName }}'
+      inputs:
+        artifact: ${{ parameters.angularArtifactName }}
+        path: 'src/Aiglusoft.IAM.Server/wwwroot'
+    - task: Docker@2
+      inputs:
+        containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
+        repository: $(dockerRepository)
+        command: 'build'
+        Dockerfile: ${{ parameters.dockerfilePath }}
+        buildContext: '.'
+        tags: ''
+      displayName: 'Build Docker image for ${{ parameters.app }}'
+    - script: |
+        echo "##vso[task.setvariable variable=ShouldPublish]false"
+        if [[ "$(Build.SourceBranch)" =~ ^refs/heads/(main|master|dev(elop)?(ment)?|release[/-].*|hotfix(es)?[/-].*)$ ]]; then
+          echo "##vso[task.setvariable variable=ShouldPublish]true"
+        fi
+      displayName: Set ShouldPublish variable
+    - task: Docker@2
+      inputs:
+        containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
+        repository: $(dockerRepository)
+        command: 'push'
+        tags: ''
+      displayName: 'Push Docker image for: ${{ parameters.app }}'
+      condition: eq(variables['ShouldPublish'], 'true')
