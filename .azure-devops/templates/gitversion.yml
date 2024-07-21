@@ -1,0 +1,20 @@
+jobs:
+- job: CalculateVersion
+  displayName: GitVersion v5 (cross stage producer)
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+    - checkout: self
+      fetchDepth: 0
+
+    - task: gitversion/setup@1.2.0
+      displayName: Install GitVersion
+      inputs:
+        versionSpec: '5.x'
+
+    - task: gitversion/execute@1.2.0
+      displayName: Determine Version
+      name: version_step # step id used as reference for output values
+      inputs:
+        useConfigFile: true
+        configFilePath: 'VersionConfig.yml'
