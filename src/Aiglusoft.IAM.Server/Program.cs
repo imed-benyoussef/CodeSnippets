@@ -169,42 +169,42 @@ services.AddSingleton<ErrorMappingService>();
 // prevent from mapping "sub" claim to nameidentifier.
 JsonWebTokenHandler.DefaultInboundClaimTypeMap.Remove("sub");
 
-services.AddAuthentication(options =>
-{
-  //options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-  //options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    services.AddAuthentication(options =>
+    {
+      options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+      options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+      options.RequireHttpsMetadata = false;
+      options.SaveToken = true;
+      var serviceProvider = services.BuildServiceProvider();
+      var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+      var certificateService = serviceProvider.GetRequiredService<ICertificateService>();
 
-  options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-  options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+      var rsa = certificateService.GetRsaPrivateKey();
+      var key = new RsaSecurityKey(rsa)
+      {
+        KeyId = certificateService.GetKeyId()
+      };
+
+      options.TokenValidationParameters = new TokenValidationParameters
+      {
+        ValidateIssuer = true,
+        ValidIssuer = configuration["Jwt:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = configuration["Jwt:Audience"],
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = key
+      };
+    })
    .AddCookie(options =>
    {
      options.LoginPath = "/signin/login";
      options.AccessDeniedPath = "/accessdenied";
-   })
-   .AddJwtBearer(options =>
-   {
-     var serviceProvider = services.BuildServiceProvider();
-     var certificateService = serviceProvider.GetRequiredService<ICertificateService>();
-     var rsa = certificateService.GetRsaPrivateKey();
-     var key = new RsaSecurityKey(rsa)
-     {
-       KeyId = certificateService.GetKeyId()
-     };
-
-     options.RequireHttpsMetadata = false;
-     options.SaveToken = true;
-     options.TokenValidationParameters = new TokenValidationParameters
-     {
-       ValidateIssuer = false,
-       ValidateAudience = false,
-       ValidateLifetime = true,
-       ValidateIssuerSigningKey = true,
-       ValidIssuer = configuration["Jwt:Issuer"],
-       ValidAudience = configuration["Jwt:Audience"],
-       IssuerSigningKey = key
-     };
    });
+
 
 // Register DatabaseSeeder as a hosted service in development environment
 if (builder.Environment.IsDevelopment())

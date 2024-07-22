@@ -5,6 +5,7 @@
   using Aiglusoft.IAM.Application.UseCases.Registers.SetUserPassword;
   using Aiglusoft.IAM.Server.Models.V1.Requests;
   using MediatR;
+  using Microsoft.AspNetCore.Authentication.JwtBearer;
   using Microsoft.AspNetCore.Authorization;
   using Microsoft.AspNetCore.Mvc;
   using System.Security.Claims;
@@ -54,7 +55,7 @@
         /// <param name="request">Objet contenant le code de vérification</param>
         /// <returns>Un message de succès</returns>
         [HttpPost("email/verify")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> VerifyEmailAsync([FromBody] VerifyEmailRequest request)
         {
             // TODO: Implémenter la logique de vérification du code email

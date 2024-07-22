@@ -16,57 +16,70 @@ namespace Aiglusoft.IAM.Infrastructure.Services
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public List<Claim> GetUserClaims(string schema = "Cookies")
+    public List<Claim> GetUserClaims(string schema = "")
     {
       var httpContext = _httpContextAccessor.HttpContext;
       if (httpContext == null)
       {
         return new List<Claim>();
       }
-
-      var authenticateResult = httpContext.AuthenticateAsync(schema).Result;
-      if (!authenticateResult.Succeeded || !authenticateResult.Principal.Identity.IsAuthenticated)
+      if (!string.IsNullOrEmpty(schema))
       {
-        return new List<Claim>();
+        var authenticateResult = httpContext.AuthenticateAsync(schema).Result;
+        if (!authenticateResult.Succeeded || !authenticateResult.Principal.Identity.IsAuthenticated)
+        {
+          return new List<Claim>();
+        }
+
+        return authenticateResult.Principal.Claims.ToList();
       }
 
-      return authenticateResult.Principal.Claims.ToList();
+      return _httpContextAccessor.HttpContext.User.Claims.ToList();
     }
 
-    public string GetUserEmail()
+    public string GetUserEmail(string schema = "")
     {
       var httpContext = _httpContextAccessor.HttpContext;
       if (httpContext == null)
       {
         return null;
       }
-
-      var authenticateResult = httpContext.AuthenticateAsync("Cookies").Result;
-      if (!authenticateResult.Succeeded || !authenticateResult.Principal.Identity.IsAuthenticated)
+      if (!string.IsNullOrEmpty(schema))
       {
-        return null;
+        var authenticateResult = httpContext.AuthenticateAsync(schema).Result;
+        if (!authenticateResult.Succeeded || !authenticateResult.Principal.Identity.IsAuthenticated)
+        {
+          return null;
+        }
+
+        var emailClaim = authenticateResult.Principal.FindFirst(ClaimTypes.Email);
+        return emailClaim?.Value;
       }
 
-      var emailClaim = authenticateResult.Principal.FindFirst(ClaimTypes.Email);
-      return emailClaim?.Value;
+      return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
     }
 
-    public async Task<string> GetUserIdAsync(string schema = "Cookies")
+    public async Task<string> GetUserIdAsync(string schema = "")
     {
       var httpContext = _httpContextAccessor.HttpContext;
       if (httpContext == null)
       {
         return null;
       }
-
-      var authenticateResult = await httpContext.AuthenticateAsync(schema);
-      if (!authenticateResult.Succeeded || !authenticateResult.Principal.Identity.IsAuthenticated)
+      if (!string.IsNullOrEmpty(schema))
       {
-        return null;
+        var authenticateResult = await httpContext.AuthenticateAsync(schema);
+        if (!authenticateResult.Succeeded || !authenticateResult.Principal.Identity.IsAuthenticated)
+        {
+          return null;
+        }
+
+        var userIdClaim = authenticateResult.Principal.FindFirst(ClaimTypes.NameIdentifier);
+        return userIdClaim?.Value;
       }
 
-      var userIdClaim = authenticateResult.Principal.FindFirst(ClaimTypes.NameIdentifier);
-      return userIdClaim?.Value;
+      return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
     }
   }
 }
