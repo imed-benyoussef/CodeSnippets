@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240714110247_VerificationCode")]
-    partial class VerificationCode
+    [Migration("20240722055907_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -274,12 +274,13 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<DateTime>("_createdAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTime>("createdAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("CreatedAt");
 
-                    b.Property<DateTime?>("_updatedAt")
-                        .IsRequired()
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTime?>("updatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("UpdatedAt");
 
                     b.HasKey("Id");
 
@@ -333,6 +334,25 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FriendlyName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Xml")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DataProtectionKeys");
                 });
 
             modelBuilder.Entity("Aiglusoft.IAM.Domain.Model.AuthorizationAggregates.AuthorizationCode", b =>
