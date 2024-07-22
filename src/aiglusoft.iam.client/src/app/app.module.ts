@@ -10,40 +10,15 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { RouterModule, Routes } from '@angular/router';
 import { loadRemoteModule } from '@angular-architects/module-federation';
-
-
-
-
-function loadRemoteStylesheet(href: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    try {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = href;
-      link.onload = () => resolve();
-      link.onerror = (err) => {
-        console.error(`Failed to load stylesheet at ${href}`, err);
-        reject(new Error(`Failed to load stylesheet at ${href}`));
-      };
-      document.head.appendChild(link);
-    } catch (error) {
-      console.error(`Error while appending stylesheet to document: ${error}`);
-      reject(new Error(`Error while appending stylesheet to document: ${error}`));
-    }
-  });
-}
-
-
-
+import { environment } from '../environments/environment';
 
 const routes: Routes = [
   {
 
     path: 'dashboard',
     loadChildren: async () => {
-      //await loadRemoteStylesheet('https://account.intranet.aiglusoft.net/styles.css'); // Charger les styles de signin
       return loadRemoteModule({
-        remoteEntry: 'https://account.intranet.aiglusoft.net/remoteEntry.js',
+        remoteEntry: `${environment.accountRemoteEntry}/remoteEntry.js`,
         remoteName: 'account',
         exposedModule: './AccountModule',
       }).then(m => m.AccountModule).catch(err => {
@@ -56,9 +31,8 @@ const routes: Routes = [
 
     path: 'signin',
     loadChildren: async () => {
-      //await loadRemoteStylesheet('https://signin.intranet.aiglusoft.net/styles.css'); // Charger les styles de signin
       return loadRemoteModule({
-        remoteEntry: 'http://localhost:4201/remoteEntry.js',
+        remoteEntry: `${environment.signinRemoteEntry}/remoteEntry.js`,
         remoteName: 'signin',
         exposedModule: './SigninModule',
       }).then(m => m.SigninModule).catch(err => {
@@ -70,9 +44,8 @@ const routes: Routes = [
   {
     path: 'signup',
     loadChildren: async () => {
-      //await loadRemoteStylesheet('https://signup.intranet.aiglusoft.net/styles.css'); // Charger les styles de signup
       return loadRemoteModule({
-        remoteEntry: 'http://localhost:4202/remoteEntry.js',
+        remoteEntry: `${environment.signupRemoteEntry}/remoteEntry.js`,
         remoteName: 'signup',
         exposedModule: './SignupModule',
       }).then(m => m.SignupModule).catch(err => {

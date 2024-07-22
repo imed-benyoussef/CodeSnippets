@@ -23,7 +23,18 @@ ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Aiglusoft.IAM.Server.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
+
+# Copy the entrypoint script to the container and give execution permissions
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENV ASPNETCORE_HTTP_PORTS="5000"
-ENTRYPOINT ["dotnet", "Aiglusoft.IAM.Server.dll"]
+
+# Define the entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Command to run the application
+CMD ["dotnet", "Aiglusoft.IAM.Server.dll"]
