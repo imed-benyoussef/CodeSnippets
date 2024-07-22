@@ -52,7 +52,7 @@ namespace Aiglusoft.IAM.Application.UseCases.Registers.SetUserPassword
     public async Task<TokenResponse> Handle(SetUserPasswordCommand request, CancellationToken cancellationToken)
     {
 
-      var email = _rootContext.GetUserEmail();
+      var email = _rootContext.FindFirstValue(JwtClaimTypes.Email);
 
       var existingUserByEmail = await _userRepository.GetByEmailAsync(email);
       if (existingUserByEmail != null)

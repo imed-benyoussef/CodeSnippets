@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Localization;
 using Aiglusoft.IAM.Domain.Exceptions;
 using Aiglusoft.IAM.Domain.Model.AuthorizationAggregates;
+using Aiglusoft.IAM.Domain.Constants;
 
 namespace Aiglusoft.IAM.Application.CommandHandlers
 {
@@ -78,7 +79,7 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
             }
 
             // Validate user
-            var userId = await _rootContext.GetUserIdAsync();
+            var userId =  _rootContext.FindFirstValue(JwtClaimTypes.Sub);
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {

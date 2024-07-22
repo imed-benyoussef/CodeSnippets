@@ -1,9 +1,11 @@
 ﻿using Aiglusoft.IAM.Domain;
+using Aiglusoft.IAM.Domain.Constants;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Aiglusoft.IAM.Infrastructure.Services
 {
@@ -16,70 +18,49 @@ namespace Aiglusoft.IAM.Infrastructure.Services
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public List<Claim> GetUserClaims(string schema = "")
+    public List<Claim> GetUserClaims()
     {
-      var httpContext = _httpContextAccessor.HttpContext;
-      if (httpContext == null)
-      {
-        return new List<Claim>();
-      }
-      if (!string.IsNullOrEmpty(schema))
-      {
-        var authenticateResult = httpContext.AuthenticateAsync(schema).Result;
-        if (!authenticateResult.Succeeded || !authenticateResult.Principal.Identity.IsAuthenticated)
-        {
-          return new List<Claim>();
-        }
+      var claims = _httpContextAccessor.HttpContext.User.Claims;
+      var transformedClaims = claims.Select(c => new Claim(TransformClaimType(c.Type), c.Value)).ToList();
 
-        return authenticateResult.Principal.Claims.ToList();
-      }
 
-      return _httpContextAccessor.HttpContext.User.Claims.ToList();
+      return transformedClaims;
     }
 
-    public string GetUserEmail(string schema = "")
+
+    public string FindFirstValue(string type)
     {
-      var httpContext = _httpContextAccessor.HttpContext;
-      if (httpContext == null)
+      var value = _httpContextAccessor.HttpContext.User.FindFirstValue(type);
+      if (string.IsNullOrEmpty(value))
       {
-        return null;
-      }
-      if (!string.IsNullOrEmpty(schema))
-      {
-        var authenticateResult = httpContext.AuthenticateAsync(schema).Result;
-        if (!authenticateResult.Succeeded || !authenticateResult.Principal.Identity.IsAuthenticated)
-        {
-          return null;
-        }
 
-        var emailClaim = authenticateResult.Principal.FindFirst(ClaimTypes.Email);
-        return emailClaim?.Value;
+        var claims = _httpContextAccessor.HttpContext.User.Claims;
+        var transformedClaims = claims.Select(c => new Claim(TransformClaimType(c.Type), c.Value)).ToList();
+
+        value = transformedClaims.FirstOrDefault(e=>e.Type == type)?.Value;
       }
 
-      return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
+
+      return value;
+    }
+    private string TransformClaimType(string claimType)
+    {
+      return claimType switch
+      {
+        JwtClaimTypes.XmlSoapName => JwtClaimTypes.Name,
+        JwtClaimTypes.XmlSoapGivenName => JwtClaimTypes.GivenName,
+        JwtClaimTypes.XmlSoapSurname => JwtClaimTypes.FamilyName,
+        JwtClaimTypes.XmlSoapEmail => JwtClaimTypes.Email,
+        JwtClaimTypes.XmlSoapRole => JwtClaimTypes.Role,
+        JwtClaimTypes.XmlSoapDateOfBirth => JwtClaimTypes.Birthdate,
+        JwtClaimTypes.XmlSoapGender => JwtClaimTypes.Gender,
+        JwtClaimTypes.XmlSoapNameIdentifier => JwtClaimTypes.UniqueName,
+
+        _ => claimType
+      };
     }
 
-    public async Task<string> GetUserIdAsync(string schema = "")
-    {
-      var httpContext = _httpContextAccessor.HttpContext;
-      if (httpContext == null)
-      {
-        return null;
-      }
-      if (!string.IsNullOrEmpty(schema))
-      {
-        var authenticateResult = await httpContext.AuthenticateAsync(schema);
-        if (!authenticateResult.Succeeded || !authenticateResult.Principal.Identity.IsAuthenticated)
-        {
-          return null;
-        }
 
-        var userIdClaim = authenticateResult.Principal.FindFirst(ClaimTypes.NameIdentifier);
-        return userIdClaim?.Value;
-      }
-
-      return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-    }
   }
+
 }

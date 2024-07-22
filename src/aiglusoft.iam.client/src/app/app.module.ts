@@ -58,7 +58,7 @@ const routes: Routes = [
     loadChildren: async () => {
       //await loadRemoteStylesheet('https://signin.intranet.aiglusoft.net/styles.css'); // Charger les styles de signin
       return loadRemoteModule({
-        remoteEntry: 'https://signin.intranet.aiglusoft.net/remoteEntry.js',
+        remoteEntry: 'http://localhost:4201/remoteEntry.js',
         remoteName: 'signin',
         exposedModule: './SigninModule',
       }).then(m => m.SigninModule).catch(err => {
@@ -72,7 +72,7 @@ const routes: Routes = [
     loadChildren: async () => {
       //await loadRemoteStylesheet('https://signup.intranet.aiglusoft.net/styles.css'); // Charger les styles de signup
       return loadRemoteModule({
-        remoteEntry: 'https://signup.intranet.aiglusoft.net/remoteEntry.js',
+        remoteEntry: 'http://localhost:4202/remoteEntry.js',
         remoteName: 'signup',
         exposedModule: './SignupModule',
       }).then(m => m.SignupModule).catch(err => {
