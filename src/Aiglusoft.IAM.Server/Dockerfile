@@ -24,15 +24,23 @@ RUN dotnet publish "./Aiglusoft.IAM.Server.csproj" -c $BUILD_CONFIGURATION -o /a
 
 FROM base AS final
 
-# Copy the entrypoint script to the container and give execution permissions
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
 
 
 WORKDIR /app
+
+# Copy the entrypoint script to the container
+COPY entrypoint.sh /entrypoint.sh
+
+# Switch to root user to modify the file permissions
+USER root
+RUN chmod +x /entrypoint.sh
+
 COPY --from=publish /app/publish .
 ENV ASPNETCORE_HTTP_PORTS="5000"
 
+
+# Switch back to a non-root user if needed
+USER nonrootuser
 # Define the entrypoint script
 ENTRYPOINT ["/entrypoint.sh"]
 
