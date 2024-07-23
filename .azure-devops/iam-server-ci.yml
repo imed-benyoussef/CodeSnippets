@@ -28,6 +28,5 @@ extends:
     angularArtifactName: 'iam-wwwroot'  # Optional: replace with your desired artifact name, or leave it to use the default
     buildConfiguration: 'Release'  # Optional: replace with your build configuration
     coberturaOutputFormat: '/p:CoverletOutputFormat=cobertura'  # Optional: replace with your Cobertura output format
-    coverageDirectory: '$(Build.ArtifactStagingDirectory)/coverage/'  # Optional: replace with your coverage directory
     # unitTestPath: 'path/to/unit/tests/*.csproj'  # Optional: replace with the path to your unit tests
     # e2eTestPath: 'path/to/e2e/tests/*.csproj'  # Optional: replace with the path to your end-to-end tests
