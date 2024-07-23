@@ -12,12 +12,10 @@ trigger:
       - docs
 
 
-variables:
-  vmImageName: 'ubuntu-latest'
-
 extends:
   template: base-pipeline.yml
   parameters:
+    vmImage: 'ubuntu-latest'
     nodeVersion: '20.x'
     app: 'iam-server'  # Replace with your actual Angular app name
     angularAppPath: 'src/aiglusoft.iam.client'  # Replace with the path to your Angular app

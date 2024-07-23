@@ -1,7 +1,7 @@
 parameters:
   - name: vmImage
     type: string
-    default: 'linux-latest'
+    default: 'ubuntu-latest'
   - name: nodeVersion
     type: string
   - name: app
