@@ -158,7 +158,7 @@ stages:
         pathToPublish: ${{ parameters.coverageDirectory }}
         artifactName: 'coverage'
         publishLocation: 'Container'
-      condition: and(succeeded(), ne('${{ parameters.coverageDirectory }}', ''), exists('${{ parameters.coverageDirectory }}/**/coverage.cobertura.xml')) # This will run the task if the previous tasks succeeded, coverageDirectory is not empty and the coverage file exists
+      condition: and(succeeded(), ne('${{ parameters.coverageDirectory }}', ''), exists('${{ parameters.coverageDirectory }}/**/*.*')) # This will run the task if the previous tasks succeeded, coverageDirectory is not empty and the coverage file exists
       continueOnError: true
     - task: PublishCodeCoverageResults@1
       displayName: 'Publish code coverage results'
