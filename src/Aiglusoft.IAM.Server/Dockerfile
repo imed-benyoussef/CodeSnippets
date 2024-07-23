@@ -38,9 +38,6 @@ RUN chmod +x /entrypoint.sh
 COPY --from=publish /app/publish .
 ENV ASPNETCORE_HTTP_PORTS="5000"
 
-
-# Switch back to a non-root user if needed
-USER nonrootuser
 # Define the entrypoint script
 ENTRYPOINT ["/entrypoint.sh"]
 
