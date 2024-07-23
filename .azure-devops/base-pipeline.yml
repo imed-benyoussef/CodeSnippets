@@ -1,4 +1,7 @@
 parameters:
+  - name: vmImage
+    type: string
+    default: 'linux-latest'
   - name: nodeVersion
     type: string
   - name: app
@@ -24,17 +27,12 @@ parameters:
   - name: coberturaOutputFormat
     type: string
     default: '/p:CoverletOutputFormat=cobertura'
-  - name: coverageDirectory
-    type: string
-    default: '$(Build.ArtifactStagingDirectory)/coverage/'
   - name: unitTestPath
     type: string
     default: ''
   - name: e2eTestPath
     type: string
     default: ''
-
-
 
 stages:
 - stage: GitVersion_v5_cross_stage
@@ -43,7 +41,7 @@ stages:
   - job: GitVersion_v5_cross_stage_producer
     displayName: 'Calculate Version'
     pool:
-      vmImage: $(vmImageName)
+      vmImage: ${{ parameters.vmImage }}
     steps:
     - checkout: self
       fetchDepth: 0
@@ -66,7 +64,7 @@ stages:
   - job: Build
     displayName: 'Build Angular'
     pool:
-      vmImage: $(vmImageName)
+      vmImage: ${{ parameters.vmImage }}
     steps:
     - checkout: self
       persistCredentials: true
@@ -110,7 +108,7 @@ stages:
   - job: BuildAndTest
     displayName: 'Build and Test .NET Solution'
     pool:
-      vmImage: $(vmImageName)
+      vmImage: ${{ parameters.vmImage }}
     steps:
     - checkout: self
       persistCredentials: true
@@ -143,32 +141,31 @@ stages:
         inputs:
           command: 'test'
           projects: ${{ parameters.unitTestPath }}
-          arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore ${{ parameters.coberturaOutputFormat }} /p:CollectCoverage=true /p:CoverletOutput=${{ parameters.coverageDirectory }}UnitTests/'
+          arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore ${{ parameters.coberturaOutputFormat }} /p:CollectCoverage=true /p:CoverletOutput=$(Build.ArtifactStagingDirectory)/coverage/UnitTests/'
     - ${{ if parameters.e2eTestPath }}:
       - task: DotNetCoreCLI@2
         displayName: 'Run end-to-end tests'
         inputs:
           command: 'test'
           projects: ${{ parameters.e2eTestPath }}
-          arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore ${{ parameters.coberturaOutputFormat }} /p:CollectCoverage=true /p:CoverletOutput=${{ parameters.coverageDirectory }}E2ETests/'
+          arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore ${{ parameters.coberturaOutputFormat }} /p:CollectCoverage=true /p:CoverletOutput=$(Build.ArtifactStagingDirectory)/coverage/E2ETests/'
         continueOnError: true
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish build artifacts'
-      inputs:
-        pathToPublish: ${{ parameters.coverageDirectory }}
-        artifactName: 'coverage'
-        publishLocation: 'Container'
-      condition: and(succeeded(), ne('${{ parameters.coverageDirectory }}', ''), exists('${{ parameters.coverageDirectory }}/**/*.*')) # This will run the task if the previous tasks succeeded, coverageDirectory is not empty and the coverage file exists
-      continueOnError: true
-    - task: PublishCodeCoverageResults@1
-      displayName: 'Publish code coverage results'
-      inputs:
-        codeCoverageTool: 'Cobertura'
-        summaryFileLocation: '${{ parameters.coverageDirectory }}/**/coverage.cobertura.xml'
-        reportDirectory: ${{ parameters.coverageDirectory }}
-        failIfCoverageEmpty: true
-      condition: and(succeeded(), ne('${{ parameters.coverageDirectory }}', ''), exists('${{ parameters.coverageDirectory }}/**/coverage.cobertura.xml')) # This will run the task if the previous tasks succeeded, coverageDirectory is not empty and the coverage file exists
-      continueOnError: true
+    - ${{ if or(parameters.e2eTestPath, parameters.unitTestPath) }}:
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish build artifacts'
+        inputs:
+          pathToPublish: $(Build.ArtifactStagingDirectory)/coverage/
+          artifactName: 'coverage'
+          publishLocation: 'Container'
+        continueOnError: true
+      - task: PublishCodeCoverageResults@1
+        displayName: 'Publish code coverage results'
+        inputs:
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: '$(Build.ArtifactStagingDirectory)/coverage/**/coverage.cobertura.xml'
+          reportDirectory: $(Build.ArtifactStagingDirectory)/coverage/
+          failIfCoverageEmpty: true
+        continueOnError: true
     - task: DotNetCoreCLI@2
       displayName: 'Publish Web Projects'
       inputs:
@@ -186,7 +183,7 @@ stages:
   - job: BuildAndPush
     displayName: 'Build and Push'
     pool:
-      vmImage: $(vmImageName)
+      vmImage: ${{ parameters.vmImage }}
     variables:
       fullSemVer: $[ stageDependencies.GitVersion_v5_cross_stage.GitVersion_v5_cross_stage_producer.outputs['version_step.fullSemVer'] ]
       semVer: $[ stageDependencies.GitVersion_v5_cross_stage.GitVersion_v5_cross_stage_producer.outputs['version_step.semVer'] ]
