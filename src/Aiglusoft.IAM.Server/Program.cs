@@ -16,6 +16,7 @@ using Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.SeedData;
 using Aiglusoft.IAM.Infrastructure.Repositories;
 using Aiglusoft.IAM.Infrastructure.Services;
 using Asp.Versioning;
+using FluentMigrator.Runner;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -125,13 +126,15 @@ services.AddMediatR(cfg =>
 var serviceProvider = new ServiceCollection()
        .AddEntityFrameworkNpgsql()
        .BuildServiceProvider();
+var connectionString = builder.Configuration.GetConnectionString("Npgsql");
 
 services.AddDbContext<AppDbContext>(options =>
 {
-  var connectionString = builder.Configuration.GetConnectionString("Npgsql");
+  
   options.UseNpgsql(connectionString);
   options.UseInternalServiceProvider(serviceProvider);
 });
+
 
 services.AddScoped<IUnitOfWork, AppDbContext>();
 
@@ -213,6 +216,30 @@ if (builder.Environment.IsDevelopment())
 }
 
 var app = builder.Build();
+
+// Utiliser les arguments pour contrôler les migrations
+using (var scope = app.Services.CreateScope())
+{
+  var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+  // Si l'argument "db-migration" est fourni, appliquer toutes les migrations
+  if (args.Contains("db-migration"))
+  {
+    Console.WriteLine("Appliquer toutes les migrations...");
+    try
+    {
+      dbContext.Database.Migrate();
+      Console.WriteLine("Migrations appliquées avec succès.");
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Erreur lors de l'application des migrations : {ex.Message}");
+    }
+
+    // Si vous voulez arrêter l'application après les migrations, ajoutez cette ligne
+    return;
+  }
+}
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

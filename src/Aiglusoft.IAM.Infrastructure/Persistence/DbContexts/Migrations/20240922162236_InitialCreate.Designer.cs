@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240721232042_AddDataprotection")]
-    partial class AddDataprotection
+    [Migration("20240922162236_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
