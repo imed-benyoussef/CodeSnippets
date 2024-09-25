@@ -24,6 +24,7 @@ extends:
     dockerRegistryServiceConnection: 'dockerhub'  # Replace with your Docker registry service connection
     dockerRepository: 'aiglusoft'  # Replace with your Docker repository
     angularArtifactName: 'iam-wwwroot'  # Optional: replace with your desired artifact name, or leave it to use the default
+    wwwrootPath: 'src/Aiglusoft.IAM.Server/wwwroot'
     buildConfiguration: 'Release'  # Optional: replace with your build configuration
     coberturaOutputFormat: '/p:CoverletOutputFormat=cobertura'  # Optional: replace with your Cobertura output format
     # unitTestPath: 'path/to/unit/tests/*.csproj'  # Optional: replace with the path to your unit tests
