@@ -8,6 +8,10 @@ parameters:
     type: string
   - name: angularAppPath
     type: string
+    default: ''
+  - name: wwwrootPath
+    type: string
+    default: ''
   - name: dockerfilePath
     type: string
   - name: dockerRegistryServiceConnection
@@ -19,6 +23,7 @@ parameters:
     type: string
   - name: angularArtifactName
     type: string
+    default: ''
   - name: projectPath
     type: string
   - name: buildConfiguration
@@ -60,6 +65,7 @@ stages:
 
 - stage: BuildAngular
   displayName: 'Build Angular'
+  condition: and(succeeded(), ne('${{ parameters.angularAppPath }}', ''))
   jobs:
   - job: Build
     displayName: 'Build Angular'
@@ -177,8 +183,9 @@ stages:
   displayName: 'Build and Push Docker'
   dependsOn:
     - GitVersion_v5_cross_stage
-    - BuildAngular
     - BuildDotNet
+    - ${{ if ne(parameters.angularAppPath, '') }}:
+      - BuildAngular
   jobs:
   - job: BuildAndPush
     displayName: 'Build and Push'
@@ -189,11 +196,12 @@ stages:
       semVer: $[ stageDependencies.GitVersion_v5_cross_stage.GitVersion_v5_cross_stage_producer.outputs['version_step.semVer'] ]
       dockerRepository: '${{ parameters.dockerRepository }}/${{ parameters.app }}:$(semVer)'
     steps:
-    - task: DownloadPipelineArtifact@2
-      displayName: 'Download Artifact: ${{ parameters.angularArtifactName }}'
-      inputs:
-        artifact: ${{ parameters.angularArtifactName }}
-        path: 'src/Aiglusoft.IAM.Server/wwwroot'
+    - ${{ if and(ne(parameters.wwwrootPath, ''),ne(parameters.angularArtifactName, '')) }}:
+      - task: DownloadPipelineArtifact@2
+        displayName: 'Download Artifact: ${{ parameters.angularArtifactName }}'
+        inputs:
+          artifact: ${{ parameters.angularArtifactName }}
+          path: '${{ parameters.wwwrootPath }}'
     - task: Docker@2
       inputs:
         containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
