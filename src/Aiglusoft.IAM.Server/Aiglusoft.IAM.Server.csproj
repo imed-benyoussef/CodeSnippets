@@ -12,16 +12,28 @@
 		<SpaRoot>..\aiglusoft.iam.client</SpaRoot>
 		<SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
 		<SpaProxyServerUrl>https://localhost:4233</SpaProxyServerUrl>
+
+
+
 	</PropertyGroup>
 
+	<PropertyGroup>	
+		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyTitle>Aiglusoft IAM</AssemblyTitle>
+		<Authors>Imed BEN YOUSSEF</Authors>
+		<Product>Aiglusoft IAM</Product>
+		<Description>A secure and scalable Identity and Access Management platform for Aiglusoft.</Description>
+		<Copyright>© 2024 Aiglusoft Technologies</Copyright>
+	</PropertyGroup>
 
 	<!--GitVersion-->
-	<!-- <ItemGroup>
+	<ItemGroup>
 		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-	</ItemGroup> -->
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
@@ -40,7 +52,7 @@
 	<!--Authentication-->
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7">
-		  <TreatAsUsed>true</TreatAsUsed>
+			<TreatAsUsed>true</TreatAsUsed>
 		</PackageReference>
 	</ItemGroup>
 
