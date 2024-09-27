@@ -26,7 +26,7 @@ namespace Aiglusoft.IAM.Domain.Model.ClientAggregates
       if (string.IsNullOrWhiteSpace(clientId)) throw new ArgumentException("Client ID cannot be null or empty", nameof(clientId));
       if (string.IsNullOrWhiteSpace(clientSecret)) throw new ArgumentException("Client Secret cannot be null or empty", nameof(clientSecret));
       if (string.IsNullOrWhiteSpace(clientName)) throw new ArgumentException("Client Name cannot be null or empty", nameof(clientName));
-
+      Id = Guid.NewGuid().ToString();
       ClientId = clientId;
       ClientSecret = HashSecret(clientSecret);
       ClientName = clientName;

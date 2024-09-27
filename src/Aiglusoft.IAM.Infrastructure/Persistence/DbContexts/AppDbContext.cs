@@ -56,7 +56,6 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts
       modelBuilder.Entity<Client>(entity =>
       {
         entity.HasKey(e => e.Id);
-        entity.HasIndex(e => e.ClientId);
         entity.HasMany(e => e.RedirectUris).WithOne(r => r.Client).HasForeignKey(r => r.ClientId);
         entity.HasMany(e => e.Scopes).WithOne(s => s.Client).HasForeignKey(s => s.ClientId);
         entity.HasMany(e => e.GrantTypes).WithOne(g => g.Client).HasForeignKey(g => g.ClientId);
