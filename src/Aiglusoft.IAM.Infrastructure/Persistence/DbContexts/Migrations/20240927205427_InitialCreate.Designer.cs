@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240922162236_InitialCreate")]
+    [Migration("20240927205427_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -67,12 +67,16 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AuthorizationCodes");
+                    b.ToTable("AuthorizationCode");
                 });
 
             modelBuilder.Entity("Aiglusoft.IAM.Domain.Model.ClientAggregates.Client", b =>
                 {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
                     b.Property<string>("ClientId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ClientName")
@@ -83,9 +87,11 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("ClientId");
+                    b.HasKey("Id");
 
-                    b.ToTable("Clients");
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("Client");
                 });
 
             modelBuilder.Entity("Aiglusoft.IAM.Domain.Model.ClientAggregates.ClientGrantType", b =>
@@ -105,7 +111,7 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.ToTable("ClientGrantTypes");
+                    b.ToTable("ClientGrantType");
                 });
 
             modelBuilder.Entity("Aiglusoft.IAM.Domain.Model.ClientAggregates.ClientRedirectUri", b =>
@@ -125,7 +131,7 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.ToTable("ClientRedirectUris");
+                    b.ToTable("ClientRedirectUri");
                 });
 
             modelBuilder.Entity("Aiglusoft.IAM.Domain.Model.ClientAggregates.ClientScope", b =>
@@ -145,7 +151,7 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.ToTable("ClientScopes");
+                    b.ToTable("ClientScope");
                 });
 
             modelBuilder.Entity("Aiglusoft.IAM.Domain.Model.CodeValidators.CodeValidator", b =>
@@ -224,7 +230,7 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Tokens");
+                    b.ToTable("Token");
                 });
 
             modelBuilder.Entity("Aiglusoft.IAM.Domain.Model.UserAggregates.User", b =>

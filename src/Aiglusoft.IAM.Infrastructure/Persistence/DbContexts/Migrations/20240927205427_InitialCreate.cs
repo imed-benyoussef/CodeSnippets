@@ -13,16 +13,17 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Clients",
+                name: "Client",
                 columns: table => new
                 {
+                    Id = table.Column<string>(type: "text", nullable: false),
                     ClientId = table.Column<string>(type: "text", nullable: false),
                     ClientSecret = table.Column<string>(type: "text", nullable: false),
                     ClientName = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Clients", x => x.ClientId);
+                    table.PrimaryKey("PK_Client", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -81,7 +82,7 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ClientGrantTypes",
+                name: "ClientGrantType",
                 columns: table => new
                 {
                     ClientGrantTypeId = table.Column<string>(type: "text", nullable: false),
@@ -90,17 +91,17 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClientGrantTypes", x => x.ClientGrantTypeId);
+                    table.PrimaryKey("PK_ClientGrantType", x => x.ClientGrantTypeId);
                     table.ForeignKey(
-                        name: "FK_ClientGrantTypes_Clients_ClientId",
+                        name: "FK_ClientGrantType_Client_ClientId",
                         column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "ClientId",
+                        principalTable: "Client",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ClientRedirectUris",
+                name: "ClientRedirectUri",
                 columns: table => new
                 {
                     ClientRedirectUriId = table.Column<string>(type: "text", nullable: false),
@@ -109,17 +110,17 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClientRedirectUris", x => x.ClientRedirectUriId);
+                    table.PrimaryKey("PK_ClientRedirectUri", x => x.ClientRedirectUriId);
                     table.ForeignKey(
-                        name: "FK_ClientRedirectUris_Clients_ClientId",
+                        name: "FK_ClientRedirectUri_Client_ClientId",
                         column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "ClientId",
+                        principalTable: "Client",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ClientScopes",
+                name: "ClientScope",
                 columns: table => new
                 {
                     ClientScopeId = table.Column<string>(type: "text", nullable: false),
@@ -128,17 +129,17 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClientScopes", x => x.ClientScopeId);
+                    table.PrimaryKey("PK_ClientScope", x => x.ClientScopeId);
                     table.ForeignKey(
-                        name: "FK_ClientScopes_Clients_ClientId",
+                        name: "FK_ClientScope_Client_ClientId",
                         column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "ClientId",
+                        principalTable: "Client",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AuthorizationCodes",
+                name: "AuthorizationCode",
                 columns: table => new
                 {
                     AuthorizationCodeId = table.Column<string>(type: "text", nullable: false),
@@ -153,15 +154,15 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AuthorizationCodes", x => x.AuthorizationCodeId);
+                    table.PrimaryKey("PK_AuthorizationCode", x => x.AuthorizationCodeId);
                     table.ForeignKey(
-                        name: "FK_AuthorizationCodes_Clients_ClientId",
+                        name: "FK_AuthorizationCode_Client_ClientId",
                         column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "ClientId",
+                        principalTable: "Client",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AuthorizationCodes_Users_UserId",
+                        name: "FK_AuthorizationCode_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -169,7 +170,7 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Tokens",
+                name: "Token",
                 columns: table => new
                 {
                     TokenId = table.Column<string>(type: "text", nullable: false),
@@ -181,15 +182,15 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tokens", x => x.TokenId);
+                    table.PrimaryKey("PK_Token", x => x.TokenId);
                     table.ForeignKey(
-                        name: "FK_Tokens_Clients_ClientId",
+                        name: "FK_Token_Client_ClientId",
                         column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "ClientId",
+                        principalTable: "Client",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Tokens_Users_UserId",
+                        name: "FK_Token_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -236,28 +237,33 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuthorizationCodes_ClientId",
-                table: "AuthorizationCodes",
+                name: "IX_AuthorizationCode_ClientId",
+                table: "AuthorizationCode",
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuthorizationCodes_UserId",
-                table: "AuthorizationCodes",
+                name: "IX_AuthorizationCode_UserId",
+                table: "AuthorizationCode",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClientGrantTypes_ClientId",
-                table: "ClientGrantTypes",
+                name: "IX_Client_ClientId",
+                table: "Client",
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClientRedirectUris_ClientId",
-                table: "ClientRedirectUris",
+                name: "IX_ClientGrantType_ClientId",
+                table: "ClientGrantType",
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClientScopes_ClientId",
-                table: "ClientScopes",
+                name: "IX_ClientRedirectUri_ClientId",
+                table: "ClientRedirectUri",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClientScope_ClientId",
+                table: "ClientScope",
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
@@ -267,13 +273,13 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tokens_ClientId",
-                table: "Tokens",
+                name: "IX_Token_ClientId",
+                table: "Token",
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tokens_UserId",
-                table: "Tokens",
+                name: "IX_Token_UserId",
+                table: "Token",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -291,16 +297,16 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AuthorizationCodes");
+                name: "AuthorizationCode");
 
             migrationBuilder.DropTable(
-                name: "ClientGrantTypes");
+                name: "ClientGrantType");
 
             migrationBuilder.DropTable(
-                name: "ClientRedirectUris");
+                name: "ClientRedirectUri");
 
             migrationBuilder.DropTable(
-                name: "ClientScopes");
+                name: "ClientScope");
 
             migrationBuilder.DropTable(
                 name: "CodeValidators");
@@ -309,7 +315,7 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                 name: "DataProtectionKeys");
 
             migrationBuilder.DropTable(
-                name: "Tokens");
+                name: "Token");
 
             migrationBuilder.DropTable(
                 name: "UserClaims");
@@ -318,7 +324,7 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                 name: "UserRoles");
 
             migrationBuilder.DropTable(
-                name: "Clients");
+                name: "Client");
 
             migrationBuilder.DropTable(
                 name: "Users");

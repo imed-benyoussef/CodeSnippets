@@ -1,4 +1,5 @@
-﻿using Aiglusoft.IAM.Domain.Model;
+﻿using Aiglusoft.IAM.Application.Queries;
+using Aiglusoft.IAM.Domain.Model;
 using Aiglusoft.IAM.Domain.Model.AuthorizationAggregates;
 using Aiglusoft.IAM.Domain.Model.ClientAggregates;
 using Aiglusoft.IAM.Domain.Model.CodeValidators;
@@ -13,7 +14,7 @@ using System.Data;
 
 namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts
 {
-  public class AppDbContext : DbContext, IUnitOfWork, IDataProtectionKeyContext
+  public class AppDbContext : DbContext, IQueryContext, IUnitOfWork, IDataProtectionKeyContext
   {
     private readonly IMediator _mediator;
     private IDbContextTransaction _currentTransaction;
@@ -35,15 +36,15 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts
 
     public bool HasActiveTransaction => _currentTransaction != null;
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
-    public DbSet<User> Users { get; set; }
-    public DbSet<UserClaim> UserClaims { get; set; }
-    public DbSet<Client> Clients { get; set; }
-    public DbSet<ClientRedirectUri> ClientRedirectUris { get; set; }
-    public DbSet<ClientScope> ClientScopes { get; set; }
-    public DbSet<ClientGrantType> ClientGrantTypes { get; set; }
-    public DbSet<AuthorizationCode> AuthorizationCodes { get; set; }
-    public DbSet<Token> Tokens { get; set; }
-    public DbSet<CodeValidator> CodeValidators { get; set; }
+    public IQueryable<User> Users => Set<User>().AsNoTracking();
+    public IQueryable<UserClaim> UserClaims => Set<UserClaim>().AsNoTracking();
+    public IQueryable<Client> Clients => Set<Client>().AsNoTracking();
+    public IQueryable<ClientRedirectUri> ClientRedirectUris => Set<ClientRedirectUri>().AsNoTracking();
+    public IQueryable<ClientScope> ClientScopes => Set<ClientScope>().AsNoTracking();
+    public IQueryable<ClientGrantType> ClientGrantTypes => Set<ClientGrantType>().AsNoTracking();
+    public IQueryable<AuthorizationCode> AuthorizationCodes => Set<AuthorizationCode>().AsNoTracking();
+    public IQueryable<Token> Tokens => Set<Token>().AsNoTracking();
+    public IQueryable<CodeValidator> CodeValidators => Set<CodeValidator>().AsNoTracking();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,7 +55,8 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts
       // Configure Client entity
       modelBuilder.Entity<Client>(entity =>
       {
-        entity.HasKey(e => e.ClientId);
+        entity.HasKey(e => e.Id);
+        entity.HasIndex(e => e.ClientId);
         entity.HasMany(e => e.RedirectUris).WithOne(r => r.Client).HasForeignKey(r => r.ClientId);
         entity.HasMany(e => e.Scopes).WithOne(s => s.Client).HasForeignKey(s => s.ClientId);
         entity.HasMany(e => e.GrantTypes).WithOne(g => g.Client).HasForeignKey(g => g.ClientId);
@@ -192,6 +194,9 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts
         }
       }
     }
+
+    public IQueryable<T> GetQueryable<T>() where T : class
+      => Set<T>().AsNoTracking();
   }
 
   static class MediatorExtension

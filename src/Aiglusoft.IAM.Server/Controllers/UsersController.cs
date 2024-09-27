@@ -1,21 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using MediatR;
 using Asp.Versioning;
-using Aiglusoft.IAM.Application.UseCases.Clients.CreateClient;
-using Aiglusoft.IAM.Application.UseCases.Clients.GetClients;
 using static Microsoft.AspNetCore.Http.StatusCodes;
+using Aiglusoft.IAM.Application.UseCases.Users.GetUsers;
 
 namespace Aiglusoft.IAM.Server.Controllers
 {
   [ApiVersion(1.0)]
   [ApiController]
-  [Route("api/v{version:apiVersion}/clients")]
-  public class ClientsController : ControllerBase
+  [Route("api/v{version:apiVersion}/users")]
+  public class UsersController : ControllerBase
   {
     private readonly IMediator _mediator;
 
-    public ClientsController(IMediator mediator)
+    public UsersController(IMediator mediator)
     {
       _mediator = mediator;
     }
@@ -38,7 +36,7 @@ namespace Aiglusoft.IAM.Server.Controllers
       try
       {
         // Créer une requête GetAllActsQuery avec les paramètres OData-like
-        var query = new GetClientsQuery { Filter = filter, OrderBy = orderBy, Top = top, Skip = skip, Select = select };
+        var query = new GetUsersQuery { Filter = filter, OrderBy = orderBy, Top = top, Skip = skip, Select = select };
 
         // Envoyer la requête via MediatR
         var result = await _mediator.Send(query);
@@ -53,11 +51,5 @@ namespace Aiglusoft.IAM.Server.Controllers
       }
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateClient([FromBody] CreateClientCommand command)
-    {
-      var result = await _mediator.Send(command);
-      return Ok(result);
-    }
   }
 }

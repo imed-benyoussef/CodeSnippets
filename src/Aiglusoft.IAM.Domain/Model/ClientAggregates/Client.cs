@@ -5,6 +5,7 @@ namespace Aiglusoft.IAM.Domain.Model.ClientAggregates
 {
   public class Client : IAggregateRoot
   {
+    public string Id { get; set; }
     public string ClientId { get; private set; }
     public string ClientSecret { get; private set; }
     public string ClientName { get; private set; }

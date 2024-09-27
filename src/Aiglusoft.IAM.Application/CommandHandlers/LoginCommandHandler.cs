@@ -68,7 +68,7 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
 
             return new UserDto
             {
-                UserId = user.Id,
+                Id = user.Id,
                 Username = user.Username,
                 Email = user.Email
             };

@@ -21,36 +21,36 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
 
         public async Task<User> GetByIdAsync(string userId)
         {
-            return await _context.Users
+            return await _context.Set<User > ()
                                  .Include(u => u.Claims)
                                  .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         public async Task<User> GetByUsernameAsync(string username)
         {
-            return await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
+            return await _context.Set<User > ().SingleOrDefaultAsync(u => u.Username == username);
         }
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            return await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
+            return await _context.Set<User > ().SingleOrDefaultAsync(u => u.Email == email);
         }
 
         public async Task AddAsync(User user)
         {
-            await _context.Users.AddAsync(user);
+            await _context.Set<User > ().AddAsync(user);
             await _context.SaveEntitiesAsync();
         }
 
         public async Task UpdateAsync(User user)
         {
-            _context.Users.Update(user);
+            _context.Set<User > ().Update(user);
             await _context.SaveEntitiesAsync();
         }
 
         public Task<bool> IsUsernameTakenAsync(string username)
         {
-          return _context.Users.AnyAsync(e=>e.Username.ToLower() == username.ToLower());
+          return _context.Set<User > ().AnyAsync(e=>e.Username.ToLower() == username.ToLower());
         }
     }
 
@@ -65,7 +65,7 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
 
         public async Task<Client> GetByIdAsync(string clientId)
         {
-            return await _context.Clients
+            return await _context.Set<Client> ()
                                  .Include(c => c.RedirectUris)
                                  .Include(c => c.Scopes)
                                  .Include(c => c.GrantTypes)
@@ -74,19 +74,19 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
 
         public async Task AddAsync(Client client)
         {
-            await _context.Clients.AddAsync(client);
+            await _context.Set<Client> ().AddAsync(client);
             await _context.SaveEntitiesAsync();
         }
 
         public async Task UpdateAsync(Client client)
         {
-            _context.Clients.Update(client);
+            _context.Set<Client> ().Update(client);
             await _context.SaveEntitiesAsync();
         }
 
         public async Task DeleteAsync(Client client)
         {
-            _context.Clients.Remove(client);
+            _context.Set<Client> ().Remove(client);
             await _context.SaveEntitiesAsync();
         }
     }
@@ -102,7 +102,7 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
 
         public async Task<AuthorizationCode> GetByCodeAsync(string code)
         {
-            return await _context.AuthorizationCodes
+            return await _context.Set<AuthorizationCode> ()
                                  .Include(ac => ac.Client)
                                  .Include(ac => ac.User)
                                  .FirstOrDefaultAsync(ac => ac.Code == code);
@@ -110,7 +110,7 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
 
         public async Task AddAsync(AuthorizationCode authorizationCode)
         {
-            await _context.AuthorizationCodes.AddAsync(authorizationCode);
+            await _context.Set<AuthorizationCode> ().AddAsync(authorizationCode);
             await _context.SaveEntitiesAsync();
         }
     }
@@ -126,7 +126,7 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
 
         public async Task<Token> GetByValueAsync(string tokenValue)
         {
-            return await _context.Tokens
+            return await _context.Set<Token> ()
                                  .Include(t => t.Client)
                                  .Include(t => t.User)
                                  .FirstOrDefaultAsync(t => t.Value == tokenValue);
@@ -134,13 +134,13 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
 
         public async Task AddAsync(Token token)
         {
-            await _context.Tokens.AddAsync(token);
+            await _context.Set<Token> ().AddAsync(token);
             await _context.SaveEntitiesAsync();
         }
 
         public async Task UpdateAsync(Token token)
         {
-            _context.Tokens.Update(token);
+            _context.Set<Token> ().Update(token);
             await _context.SaveEntitiesAsync();
         }
     }

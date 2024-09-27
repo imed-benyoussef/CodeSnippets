@@ -18,12 +18,12 @@ namespace Aiglusoft.IAM.Infrastructure.Repositories
 
         public async Task<CodeValidator> GetAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return await _context.CodeValidators.FindAsync(id, cancellationToken);
+            return await _context.CodeValidators.FirstOrDefaultAsync(e=>e.Id == id, cancellationToken);
         }
 
         public async Task SaveAsync(CodeValidator codeValidator, CancellationToken cancellationToken = default)
         {
-            var existingEntity = await _context.CodeValidators.FindAsync(codeValidator.Id);
+            var existingEntity = await _context.CodeValidators.FirstOrDefaultAsync(e => e.Id == codeValidator.Id);
             if (existingEntity == null)
             {
                 _context.Add(codeValidator);

@@ -1,6 +1,9 @@
 using Aiglusoft.IAM.Application;
 using Aiglusoft.IAM.Application.Behaviors;
 using Aiglusoft.IAM.Application.DomainEventHandlers;
+using Aiglusoft.IAM.Application.Mappings;
+using Aiglusoft.IAM.Application.Queries;
+using Aiglusoft.IAM.Application.Services;
 using Aiglusoft.IAM.Domain;
 using Aiglusoft.IAM.Domain.Events;
 using Aiglusoft.IAM.Domain.Factories;
@@ -30,6 +33,7 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Globalization;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder();
 
@@ -109,6 +113,10 @@ services.AddEndpointsApiExplorer();
 services.AddValidatorsFromAssembly(typeof(ApplicationModule).Assembly);
 
 
+services.AddAutoMapper(opt =>
+{
+  opt.AddProfile<MappingProfile>();
+});
 
 services.AddMediatR(cfg =>
 {
@@ -136,7 +144,9 @@ services.AddDbContext<AppDbContext>(options =>
 });
 
 
+services.AddScoped<IQueryContext, AppDbContext>();
 services.AddScoped<IUnitOfWork, AppDbContext>();
+services.AddScoped(typeof(IODataQueryService<>), typeof(ODataQueryService<>));
 
 builder.Services.AddDataProtection()
     .PersistKeysToDbContext<AppDbContext>();
