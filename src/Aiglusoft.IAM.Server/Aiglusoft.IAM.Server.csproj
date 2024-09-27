@@ -13,32 +13,17 @@
 		<SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
 		<SpaProxyServerUrl>https://localhost:4233</SpaProxyServerUrl>
 
+		<UpdateAssemblyInfo>false</UpdateAssemblyInfo>
 
-
-	</PropertyGroup>
-
-	<PropertyGroup>	
-		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-		<SignAssembly>True</SignAssembly>
-		<AssemblyTitle>Aiglusoft IAM</AssemblyTitle>
-		<Authors>Imed BEN YOUSSEF</Authors>
-		<Product>Aiglusoft IAM</Product>
-		<Description>A secure and scalable Identity and Access Management platform for Aiglusoft.</Description>
-		<Copyright>© 2024 Aiglusoft Technologies</Copyright>
 	</PropertyGroup>
 
 	<!--GitVersion-->
 	<ItemGroup>
-		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-	</ItemGroup>
-
-	<ItemGroup>
+		<!--<PackageReference Include="GitVersion.MsBuild" Version="6.0.0">
+			<PrivateAssets>All</PrivateAssets>
+		</PackageReference>-->
 		<PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
 		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
-		<PackageReference Include="FluentMigrator.Runner.Firebird" Version="5.2.0" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.2" />
 
 		<PackageReference Include="Microsoft.AspNetCore.SpaProxy">

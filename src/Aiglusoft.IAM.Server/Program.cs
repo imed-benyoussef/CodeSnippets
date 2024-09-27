@@ -1,11 +1,9 @@
 using Aiglusoft.IAM.Application;
 using Aiglusoft.IAM.Application.Behaviors;
-using Aiglusoft.IAM.Application.DomainEventHandlers;
 using Aiglusoft.IAM.Application.Mappings;
 using Aiglusoft.IAM.Application.Queries;
 using Aiglusoft.IAM.Application.Services;
 using Aiglusoft.IAM.Domain;
-using Aiglusoft.IAM.Domain.Events;
 using Aiglusoft.IAM.Domain.Factories;
 using Aiglusoft.IAM.Domain.Model;
 using Aiglusoft.IAM.Domain.Model.CodeValidators;
@@ -19,10 +17,7 @@ using Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.SeedData;
 using Aiglusoft.IAM.Infrastructure.Repositories;
 using Aiglusoft.IAM.Infrastructure.Services;
 using Asp.Versioning;
-using FluentMigrator.Runner;
 using FluentValidation;
-using MediatR;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Localization;
@@ -33,7 +28,6 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Globalization;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder();
 
