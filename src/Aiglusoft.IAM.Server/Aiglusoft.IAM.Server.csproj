@@ -13,7 +13,6 @@
 		<SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
 		<SpaProxyServerUrl>https://localhost:4233</SpaProxyServerUrl>
 
-		<UpdateAssemblyInfo>false</UpdateAssemblyInfo>
 
 	</PropertyGroup>
 
