@@ -1,86 +1,69 @@
+mode: ContinuousDeployment
 branches:
-  main:
-    regex: ^master$|^main$
-    mode: ContinuousDelivery
+  master:
     tag: ''
     increment: Patch
     prevent-increment-of-merged-branch-version: true
     track-merge-target: false
-    source-branches: [ 'develop', 'release' ]
-    tracks-release-branches: false
-    is-release-branch: false
+    regex: ^master$
+    source-branches: [ develop, release, hotfix ]
     is-mainline: true
-    pre-release-weight: 55000
+    tracks-release-branches: false
   develop:
-    regex: ^dev(elop)?(ment)?$
-    mode: ContinuousDeployment
-    tag: alpha
+    tag: 'alpha'
     increment: Minor
     prevent-increment-of-merged-branch-version: false
-    track-merge-target: true
-    source-branches: []
-    tracks-release-branches: true
-    is-release-branch: false
-    is-mainline: false
-    pre-release-weight: 0
+    track-merge-target: false
+    regex: ^develop$
+    source-branches: [ feature, hotfix ]
+    tracks-release-branches: false
   release:
-    regex: ^releases?[/-]
-    mode: ContinuousDelivery
-    tag: beta
+    tag: 'beta'
     increment: None
     prevent-increment-of-merged-branch-version: true
-    track-merge-target: false
-    source-branches: [ 'develop', 'main', 'support', 'release' ]
-    tracks-release-branches: false
-    is-release-branch: true
-    is-mainline: false
-    pre-release-weight: 30000
-  feature:
-    regex: ^features?[/-]
-    mode: ContinuousDelivery
-    tag: useBranchName
-    increment: Inherit
-    prevent-increment-of-merged-branch-version: false
-    track-merge-target: false
-    source-branches: [ 'develop', 'main', 'release', 'feature', 'support', 'hotfix' ]
-    tracks-release-branches: false
-    is-release-branch: false
-    is-mainline: false
-    pre-release-weight: 30000
-  pull-request:
-    regex: ^(pull|pull\-requests|pr)[/-]
-    mode: ContinuousDelivery
-    tag: PullRequest
-    increment: Inherit
-    prevent-increment-of-merged-branch-version: false
-    tag-number-pattern: '[/-](?<number>\d+)[-/]'
-    track-merge-target: false
-    source-branches: [ 'develop', 'main', 'release', 'feature', 'support', 'hotfix' ]
-    tracks-release-branches: false
-    is-release-branch: false
-    is-mainline: false
-    pre-release-weight: 30000
+    track-merge-target: true
+    regex: ^release[/-]
+    source-branches: [ develop ]
+    tracks-release-branches: true
   hotfix:
-    regex: ^hotfix(es)?[/-]
-    mode: ContinuousDelivery
-    tag: beta
+    tag: 'hotfix'
     increment: Patch
-    prevent-increment-of-merged-branch-version: false
-    track-merge-target: false
-    source-branches: [ 'develop', 'main', 'support' ]
+    regex: ^hotfix[/-]
+    source-branches: [ master, develop ]
+    tracks-release-branches: false
+  feature:
+    tag: 'feature'
+    increment: Minor
+    regex: ^feature[/-]
+    source-branches: [ develop ]
+    tracks-release-branches: false
+  bugfix:
+    tag: 'bugfix'
+    increment: Patch
+    regex: ^bugfix[/-]
+    source-branches: [ develop, master ]
+    tracks-release-branches: false
+
+  # New Pull Request Branch Configuration
+  pull-request:
+    tag: 'PR'
+    increment: Inherit  # Pull requests will inherit the versioning scheme from their source branch
+    regex: ^pull/(.*)/merge$
+    source-branches: [ develop, feature, hotfix, release ]
     tracks-release-branches: false
     is-release-branch: false
-    is-mainline: false
-    pre-release-weight: 30000
-  support:
-    regex: ^support[/-]
-    mode: ContinuousDelivery
-    tag: ''
-    increment: Patch
-    prevent-increment-of-merged-branch-version: true
     track-merge-target: false
-    source-branches: [ 'main' ]
-    tracks-release-branches: false
-    is-release-branch: false
-    is-mainline: true
-    pre-release-weight: 55000
+
+ignore:
+  sha: []
+
+merge-message-formats:
+  major: "Merge branch 'major'"
+  minor: "Merge branch 'minor'"
+  patch: "Merge branch 'patch'"
+
+commit-message-incrementing: Enabled
+commit-message-regex: "(\\+semver:(?<increment>breaking|feature|fix))"
+assembly-versioning-scheme: MajorMinorPatch
+assembly-file-versioning-format: '{MajorMinorPatch}.{CommitsSinceVersionSource}'
+assembly-informational-format: '{FullSemVer}'
