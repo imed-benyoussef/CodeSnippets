@@ -1,9 +1,14 @@
+trigger:
+- master
+- develop
+
 parameters:
   - name: vmImage
     type: string
     default: 'ubuntu-latest'
   - name: nodeVersion
     type: string
+    default: '20.x'
   - name: app
     type: string
   - name: angularAppPath
@@ -40,189 +45,169 @@ parameters:
     default: ''
 
 stages:
-- stage: GitVersion_v5_cross_stage
-  displayName: 'Calculate GitVersion'
+- stage: BuildAll
+  displayName: 'Build and Push'
   jobs:
-  - job: GitVersion_v5_cross_stage_producer
-    displayName: 'Calculate Version'
-    pool:
-      vmImage: ${{ parameters.vmImage }}
-    steps:
-    - checkout: self
-      fetchDepth: 0
-
-    - task: gitversion/setup@1.2.0
-      displayName: Install GitVersion
-      inputs:
-        versionSpec: '5.x'
-
-    - task: gitversion/execute@1.2.0
-      displayName: Determine Version
-      name: version_step # step id used as reference for output values
-      inputs:
-        useConfigFile: true
-        configFilePath: 'VersionConfig.yml'
-        updateAssemblyInfo: true
-
-- stage: BuildAngular
-  displayName: 'Build Angular'
-  condition: and(succeeded(), ne('${{ parameters.angularAppPath }}', ''))
-  jobs:
-  - job: Build
-    displayName: 'Build Angular'
-    pool:
-      vmImage: ${{ parameters.vmImage }}
-    steps:
-    - checkout: self
-      persistCredentials: true
-      clean: true
-      fetchDepth: 0
-    - task: UseNode@1
-      inputs:
-        version: ${{ parameters.nodeVersion }}
-      displayName: 'Install Node.js ${{ parameters.nodeVersion }}'
-    - script: |
-        npm install -g @angular/cli@18
-      displayName: 'Install Angular CLI'
-    - task: Npm@1
-      inputs:
-        command: 'custom'
-        workingDir: '${{ parameters.angularAppPath }}'
-        customCommand: 'install --legacy-peer-deps'
-        customRegistry: 'useFeed'
-        customFeed: '${{ parameters.npmFeed }}'
-      displayName: 'Install dependencies: ${{ parameters.app }}'
-
-    - task: Npm@1
-      inputs:
-        command: 'custom'
-        workingDir: '${{ parameters.angularAppPath }}'
-        customCommand: 'run build -- --configuration production --output-path dist/${{ parameters.app }}'
-        customRegistry: 'useFeed'
-        customFeed: '${{ parameters.npmFeed }}'
-      displayName: 'build: ${{ parameters.app }}'
-
-    - task: PublishPipelineArtifact@1
-      displayName: 'Publish Artifact: ${{ parameters.angularArtifactName }}'
-      inputs:
-        targetPath: ${{ parameters.angularAppPath }}/dist/${{ parameters.app }}
-        artifact: ${{ parameters.angularArtifactName }}
-        publishLocation: 'pipeline'
-
-- stage: BuildDotNet
-  displayName: 'Build .NET'
-  jobs:
-  - job: BuildAndTest
-    displayName: 'Build and Test .NET Solution'
-    pool:
-      vmImage: ${{ parameters.vmImage }}
-    steps:
-    - checkout: self
-      persistCredentials: true
-      clean: true
-      fetchDepth: 0
-    - task: UseDotNet@2
-      displayName: 'Install .NET SDK 8.x'
-      inputs:
-        packageType: 'sdk'
-        version: '8.x'
-        installationPath: $(Agent.ToolsDirectory)/dotnet
-    - task: DotNetCoreCLI@2
-      displayName: 'Restore NuGet Packages'
-      inputs:
-        command: 'restore'
-        projects: ${{ parameters.projectPath }}
-    - script: |
-        find . -type f -name "*.esproj" -exec rm -f {} +
-      displayName: 'Remove .esproj files from solution'
-      continueOnError: true
-    - task: DotNetCoreCLI@2
-      displayName: 'Build Solution'
-      inputs:
-        command: 'build'
-        projects: ${{ parameters.projectPath }}
-        arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore'
-    - ${{ if parameters.unitTestPath }}:
+    - job: BuildAllJobs
+      displayName: 'Build and Test Projects'
+      pool:
+        vmImage: ${{ parameters.vmImage }}
+      variables:
+        # Variables to store GitVersion output
+        fullSemVer: ''
+        semVer: ''
+        dockerImageName: ''
+        ShouldPublish: 'false'
+      steps:
+      
+      # Step 1: Checkout the source code
+      - checkout: self
+        fetchDepth: 0
+      
+      # Step 2: Install GitVersion and determine the version
+      - task: gitversion/setup@1.2.0
+        displayName: 'Install GitVersion'
+        inputs:
+          versionSpec: '5.x'
+      
+      - task: gitversion/execute@1.2.0
+        displayName: 'Determine Version with GitVersion'
+        name: version_step
+        inputs:
+          useConfigFile: true
+          configFilePath: 'GitVersion.yml'
+          updateAssemblyInfo: true
+        continueOnError: false
+        # Capture GitVersion outputs
+      - script: |
+          echo "##vso[task.setvariable variable=fullSemVer]$(version_step.FullSemVer)"
+          echo "##vso[task.setvariable variable=semVer]$(version_step.SemVer)"
+        displayName: 'Set GitVersion variables'
+      
+      # Step 3: Build Angular app (if angularAppPath is provided)
+      - ${{ if ne(parameters.angularAppPath, '') }}:
+        - task: UseNode@1
+          displayName: 'Install Node.js ${{ parameters.nodeVersion }}'
+          inputs:
+            version: ${{ parameters.nodeVersion }}
+        
+        - script: |
+            npm install -g @angular/cli@18
+          displayName: 'Install Angular CLI'
+        
+        - task: Npm@1
+          inputs:
+            command: 'custom'
+            workingDir: '${{ parameters.angularAppPath }}'
+            customCommand: 'install --legacy-peer-deps'
+            customRegistry: 'useFeed'
+            customFeed: '${{ parameters.npmFeed }}'
+          displayName: 'Install Angular dependencies for ${{ parameters.app }}'
+        
+        - task: Npm@1
+          inputs:
+            command: 'custom'
+            workingDir: '${{ parameters.angularAppPath }}'
+            customCommand: 'run build -- --configuration production --output-path dist/${{ parameters.app }}'
+            customRegistry: 'useFeed'
+            customFeed: '${{ parameters.npmFeed }}'
+          displayName: 'Build Angular app ${{ parameters.app }}'
+        
+        - task: PublishPipelineArtifact@1
+          displayName: 'Publish Angular Artifact: ${{ parameters.angularArtifactName }}'
+          inputs:
+            targetPath: ${{ parameters.angularAppPath }}/dist/${{ parameters.app }}
+            artifact: ${{ parameters.angularArtifactName }}
+            publishLocation: 'pipeline'
+      
+      # Step 4: Build .NET project
+      - task: UseDotNet@2
+        displayName: 'Install .NET SDK 8.x'
+        inputs:
+          packageType: 'sdk'
+          version: '8.x'
+          installationPath: $(Agent.ToolsDirectory)/dotnet
+      
       - task: DotNetCoreCLI@2
-        displayName: 'Run unit tests'
+        displayName: 'Restore NuGet Packages'
         inputs:
-          command: 'test'
-          projects: ${{ parameters.unitTestPath }}
-          arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore ${{ parameters.coberturaOutputFormat }} /p:CollectCoverage=true /p:CoverletOutput=$(Build.ArtifactStagingDirectory)/coverage/UnitTests/'
-    - ${{ if parameters.e2eTestPath }}:
+          command: 'restore'
+          projects: '**/*.csproj'
+      
       - task: DotNetCoreCLI@2
-        displayName: 'Run end-to-end tests'
+        displayName: 'Build .NET Solution'
         inputs:
-          command: 'test'
-          projects: ${{ parameters.e2eTestPath }}
-          arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore ${{ parameters.coberturaOutputFormat }} /p:CollectCoverage=true /p:CoverletOutput=$(Build.ArtifactStagingDirectory)/coverage/E2ETests/'
-        continueOnError: true
-    - ${{ if or(parameters.e2eTestPath, parameters.unitTestPath) }}:
-      - task: PublishBuildArtifacts@1
-        displayName: 'Publish build artifacts'
+          command: 'build'
+          projects: '**/*.csproj'
+          arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore'
+      
+      - ${{ if parameters.unitTestPath }}:
+        - task: DotNetCoreCLI@2
+          displayName: 'Run Unit Tests'
+          inputs:
+            command: 'test'
+            projects: ${{ parameters.unitTestPath }}
+            arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore ${{ parameters.coberturaOutputFormat }} /p:CollectCoverage=true /p:CoverletOutput=$(Build.ArtifactStagingDirectory)/coverage/UnitTests/'
+      
+      - ${{ if parameters.e2eTestPath }}:
+        - task: DotNetCoreCLI@2
+          displayName: 'Run End-to-End Tests'
+          inputs:
+            command: 'test'
+            projects: ${{ parameters.e2eTestPath }}
+            arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore ${{ parameters.coberturaOutputFormat }} /p:CollectCoverage=true /p:CoverletOutput=$(Build.ArtifactStagingDirectory)/coverage/E2ETests/'
+            continueOnError: true
+      
+      - ${{ if or(parameters.e2eTestPath, parameters.unitTestPath) }}:
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Test Coverage Artifacts'
+          inputs:
+            pathToPublish: $(Build.ArtifactStagingDirectory)/coverage/
+            artifactName: 'coverage'
+            publishLocation: 'Container'
+          continueOnError: true
+        
+        - task: PublishCodeCoverageResults@1
+          displayName: 'Publish Code Coverage Results'
+          inputs:
+            codeCoverageTool: 'Cobertura'
+            summaryFileLocation: '$(Build.ArtifactStagingDirectory)/coverage/**/coverage.cobertura.xml'
+            reportDirectory: $(Build.ArtifactStagingDirectory)/coverage/
+            failIfCoverageEmpty: true
+          continueOnError: true
+      
+      # Step 5: Build and push Docker image
+      - ${{ if and(ne(parameters.wwwrootPath, ''), ne(parameters.angularArtifactName, '')) }}:
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download Angular Artifact: ${{ parameters.angularArtifactName }}'
+          inputs:
+            artifact: ${{ parameters.angularArtifactName }}
+            path: '${{ parameters.wwwrootPath }}'
+      
+      - task: Docker@2
+        displayName: 'Build Docker Image'
         inputs:
-          pathToPublish: $(Build.ArtifactStagingDirectory)/coverage/
-          artifactName: 'coverage'
-          publishLocation: 'Container'
-        continueOnError: true
-      - task: PublishCodeCoverageResults@1
-        displayName: 'Publish code coverage results'
+          containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
+          repository: '${{ parameters.dockerRepository }}/${{ parameters.app }}:$(semVer)'
+          command: 'build'
+          Dockerfile: ${{ parameters.dockerfilePath }}
+          buildContext: '.'
+          tags: |
+            $(semVer)
+      
+      - script: |
+          echo "##vso[task.setvariable variable=ShouldPublish]false"
+          if [[ "$(Build.SourceBranch)" =~ ^refs/heads/(main|master|develop|release[/-].*|hotfix[/-].*)$ ]]; then
+            echo "##vso[task.setvariable variable=ShouldPublish]true"
+          fi
+        displayName: 'Evaluate Branch for Docker Push'
+      
+      - task: Docker@2
+        displayName: 'Push Docker Image'
+        condition: eq(variables['ShouldPublish'], 'true')
         inputs:
-          codeCoverageTool: 'Cobertura'
-          summaryFileLocation: '$(Build.ArtifactStagingDirectory)/coverage/**/coverage.cobertura.xml'
-          reportDirectory: $(Build.ArtifactStagingDirectory)/coverage/
-          failIfCoverageEmpty: true
-        continueOnError: true
-    - task: DotNetCoreCLI@2
-      displayName: 'Publish Web Projects'
-      inputs:
-        command: 'publish'
-        publishWebProjects: true
-        arguments: '--configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)'
-
-- stage: BuildAndPushDocker
-  displayName: 'Build and Push Docker'
-  dependsOn:
-    - GitVersion_v5_cross_stage
-    - BuildDotNet
-    - ${{ if ne(parameters.angularAppPath, '') }}:
-      - BuildAngular
-  jobs:
-  - job: BuildAndPush
-    displayName: 'Build and Push'
-    pool:
-      vmImage: ${{ parameters.vmImage }}
-    variables:
-      fullSemVer: $[ stageDependencies.GitVersion_v5_cross_stage.GitVersion_v5_cross_stage_producer.outputs['version_step.fullSemVer'] ]
-      semVer: $[ stageDependencies.GitVersion_v5_cross_stage.GitVersion_v5_cross_stage_producer.outputs['version_step.semVer'] ]
-      dockerRepository: '${{ parameters.dockerRepository }}/${{ parameters.app }}:$(semVer)'
-    steps:
-    - ${{ if and(ne(parameters.wwwrootPath, ''),ne(parameters.angularArtifactName, '')) }}:
-      - task: DownloadPipelineArtifact@2
-        displayName: 'Download Artifact: ${{ parameters.angularArtifactName }}'
-        inputs:
-          artifact: ${{ parameters.angularArtifactName }}
-          path: '${{ parameters.wwwrootPath }}'
-    - task: Docker@2
-      inputs:
-        containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
-        repository: $(dockerRepository)
-        command: 'build'
-        Dockerfile: ${{ parameters.dockerfilePath }}
-        buildContext: '.'
-        tags: ''
-      displayName: 'Build Docker image for ${{ parameters.app }}'
-    - script: |
-        echo "##vso[task.setvariable variable=ShouldPublish]false"
-        if [[ "$(Build.SourceBranch)" =~ ^refs/heads/(main|master|dev(elop)?(ment)?|release[/-].*|hotfix(es)?[/-].*)$ ]]; then
-          echo "##vso[task.setvariable variable=ShouldPublish]true"
-        fi
-      displayName: Set ShouldPublish variable
-    - task: Docker@2
-      inputs:
-        containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
-        repository: $(dockerRepository)
-        command: 'push'
-        tags: ''
-      displayName: 'Push Docker image for: ${{ parameters.app }}'
-      condition: eq(variables['ShouldPublish'], 'true')
+          containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
+          repository: '${{ parameters.dockerRepository }}/${{ parameters.app }}:$(semVer)'
+          command: 'push'
+          tags: |
+            $(semVer)
