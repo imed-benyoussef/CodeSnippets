@@ -184,7 +184,7 @@ stages:
         displayName: 'Build Docker Image'
         inputs:
           containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
-          repository: '${{ parameters.dockerRepository }}/${{ parameters.app }}:$(semVer)'
+          repository: '${{ parameters.dockerRepository }}/${{ parameters.app }}'
           command: 'build'
           Dockerfile: ${{ parameters.dockerfilePath }}
           buildContext: '.'
@@ -203,7 +203,7 @@ stages:
         condition: eq(variables['ShouldPublish'], 'true')
         inputs:
           containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
-          repository: '${{ parameters.dockerRepository }}/${{ parameters.app }}:$(semVer)'
+          repository: '${{ parameters.dockerRepository }}/${{ parameters.app }}'
           command: 'push'
           tags: |
             $(semVer)
