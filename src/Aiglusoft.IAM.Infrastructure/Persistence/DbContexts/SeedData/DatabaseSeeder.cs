@@ -43,10 +43,10 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.SeedData
       }
       catch (Exception ex)
       {
-        context.Database.EnsureDeleted();
-        context.Database.EnsureCreated();
+        //context.Database.EnsureDeleted();
+        //context.Database.EnsureCreated();
 
-        await Seed(context, userFactory);
+        //await Seed(context, userFactory);
       }
     }
 

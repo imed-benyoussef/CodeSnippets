@@ -30,32 +30,15 @@ const routes: Routes = [
   {
 
     path: 'signin',
-    loadChildren: async () => {
-      return loadRemoteModule({
-        remoteEntry: `${environment.signinRemoteEntry}/remoteEntry.js`,
-        remoteName: 'signin',
-        exposedModule: './SigninModule',
-      }).then(m => m.SigninModule).catch(err => {
-        console.error(err);
-        return import('./fallbacks/signin-fallback.module').then(e => e.SigninFallbackModule)
-      });
-    },
+    loadChildren: () => import('./signin/signin.module').then(e => e.SigninModule)
+    ,
   },
   {
     path: 'signup',
-    loadChildren: async () => {
-      return loadRemoteModule({
-        remoteEntry: `${environment.signupRemoteEntry}/remoteEntry.js`,
-        remoteName: 'signup',
-        exposedModule: './SignupModule',
-      }).then(m => m.SignupModule).catch(err => {
-        console.error(err);
-        return import('./fallbacks/signup-fallback.module').then(e => e.SignupFallbackModule)
-      });
-    },
+    loadChildren: () => import('./signup/signup.module').then(e => e.SignupModule),
   },
   // Redirect to signin by default
-  { path: '', redirectTo: '/signin', pathMatch: 'full' }, 
+  { path: '', redirectTo: '/signin', pathMatch: 'full' },
   // Wildcard route for a 404 page (not found)
   //{ path: '**', redirectTo: '/signup' }
 ];
@@ -80,6 +63,6 @@ const routes: Routes = [
 export class AppModule {
   constructor(private translate: TranslateService) {
     // this.translate.setDefaultLang('fr');
-     this.translate.use('fr');
+    this.translate.use('fr');
   }
 }

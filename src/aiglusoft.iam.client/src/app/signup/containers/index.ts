@@ -1,0 +1,10 @@
+export { EmailVerificationPageComponent } from '././email-verification-page/email-verification-page.component';
+export { NamePageComponent } from '././name-page/name-page.component';
+export { GeneralInfoPageComponent } from '././general-info-page/general-info-page.component';
+export { EmailPageComponent } from '././email-page/email-page.component';
+export { PasswordPageComponent } from '././password-page/password-page.component';
+export { PhonePageComponent } from '././phone-page/phone-page.component';
+export { PhoneVerificationPageComponent } from '././phone-verification-page/phone-verification-page.component';
+export { WelcomePageComponent } from '././welcome-page/welcome-page.component';
+export { ReviewAndTermsPageComponent } from '././review-and-terms-page/review-and-terms-page.component';
+export { InitializingAccountPageComponent } from '././initializing-account-page/initializing-account-page.component';

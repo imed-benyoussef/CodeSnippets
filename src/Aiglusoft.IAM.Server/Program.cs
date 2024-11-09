@@ -44,6 +44,18 @@ builder.Host.UseSerilog();
 var services = builder.Services;
 var configuration = builder.Configuration;
 
+services.AddCors(options =>
+{
+  options.AddPolicy("AllowAll",
+      builder =>
+      {
+        builder
+                  .AllowAnyOrigin() // Autorise toutes les origines
+                  .AllowAnyMethod() // Autorise toutes les méthodes HTTP (GET, POST, PUT, etc.)
+                  .AllowAnyHeader(); // Autorise tous les en-têtes
+      });
+});
+
 // Configuration des services de localisation
 services.AddLocalization(options => options.ResourcesPath = "Resources/Localization");
 
@@ -213,6 +225,24 @@ JsonWebTokenHandler.DefaultInboundClaimTypeMap.Remove("sub");
    });
 
 
+// Définir des politiques d'autorisation basées sur les schémas d'authentification
+services.AddAuthorization(options =>
+{
+  // Politique basée sur le schéma d'authentification par cookie
+  options.AddPolicy("CookiePolicy", policy =>
+  {
+    policy.AuthenticationSchemes.Add("Cookies");
+    policy.RequireAuthenticatedUser();
+  });
+
+  // Politique basée sur le schéma d'authentification par JWT (Bearer)
+  options.AddPolicy("JwtPolicy", policy =>
+  {
+    policy.AuthenticationSchemes.Add("Bearer");
+    policy.RequireAuthenticatedUser();
+  });
+});
+
 // Register DatabaseSeeder as a hosted service in development environment
 if (builder.Environment.IsDevelopment())
 {
@@ -274,6 +304,7 @@ app.UseSwaggerUI(
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
+app.UseCors("AllowAll");
 
 app.UseStaticFiles();
 

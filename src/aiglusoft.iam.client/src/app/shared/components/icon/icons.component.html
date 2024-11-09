@@ -1,0 +1,14 @@
+<div class="icon-search">
+  <input
+    type="text"
+    [(ngModel)]="searchText"
+    placeholder="Search icons..."
+    class="form-control"
+  />
+</div>
+<div class="icon-grid">
+  <div *ngFor="let icon of filteredIcons" class="icon icon-item">
+    <span [ngClass]="icon"></span>
+    <p>{{ icon }}</p>
+  </div>
+</div>

@@ -13,14 +13,16 @@
 		<SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
 		<SpaProxyServerUrl>https://localhost:4233</SpaProxyServerUrl>
 
-
+		<UpdateAssemblyInfo>false</UpdateAssemblyInfo>
+		<GitVersionTargetFramework>net8.0</GitVersionTargetFramework>
+		<UseProjectNamespaceForGitVersionInformation>true</UseProjectNamespaceForGitVersionInformation>
 	</PropertyGroup>
 
 	<!--GitVersion-->
 	<ItemGroup>
-		<!--<PackageReference Include="GitVersion.MsBuild" Version="6.0.0">
+		<PackageReference Include="GitVersion.MsBuild" Version="6.0.0">
 			<PrivateAssets>All</PrivateAssets>
-		</PackageReference>-->
+		</PackageReference>
 		<PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
 		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.2" />

@@ -1,0 +1,206 @@
+{
+  "signin": {
+    "components": {
+      "login-form": {
+        "WELCOME_TO": "Bienvenue à",
+        "APPNAME": "Aiglusoft",
+        "SIGN_IN_TO_CONTINUE": "Connectez-vous pour continuer",
+        "USERNAME": "Nom d'utilisateur",
+        "PASSWORD": "Mot de passe",
+        "ENTER_USERNAME": "Entrez le nom d'utilisateur",
+        "ENTER_PASSWORD": "Entrez le mot de passe",
+        "REMEMBER_ME": "Se souvenir de moi",
+        "FORGOT_PASSWORD": "Mot de passe oublié",
+        "LOG_IN": "Se connecter",
+        "DONT_HAVE_ACCOUNT": "Vous n'avez pas de compte?",
+        "SIGN_UP": "S'inscrire",
+        "ERRORS": {
+          "USERNAME_REQUIRED": "Le nom d'utilisateur est requis",
+          "PASSWORD_REQUIRED": "Le mot de passe est requis",
+          "PASSWORD_MINLENGTH": "Le mot de passe doit comporter au moins 6 caractères"
+        }
+      },
+      "forgotPassword": {
+        "PAGE_TITLE": "Réinitialisation du mot de passe",
+        "ENTER_EMAIL_INSTRUCTIONS": "Veuillez entrer votre adresse e-mail pour recevoir les instructions de réinitialisation.",
+        "ENTER_EMAIL": "Entrez votre email",
+        "SEND_REQUEST_BUTTON": "Envoyer la demande",
+        "ERRORS": {
+          "EMAIL_REQUIRED": "L'email est requis",
+          "EMAIL_INVALID": "Veuillez entrer une adresse email valide"
+        },
+        "SUCCESS_MESSAGE": "Les instructions ont été envoyées à votre adresse e-mail",
+        "ERROR_MESSAGE": "Une erreur s'est produite lors du traitement de votre demande"
+      },
+      "resetPassword": {
+        "title": "Réinitialiser le mot de passe",
+        "instructions": "Veuillez entrer votre nouveau mot de passe.",
+        "password": {
+          "label": "Nouveau mot de passe",
+          "validation": {
+            "required": "Le mot de passe est requis."
+          }
+        },
+        "confirmPassword": {
+          "label": "Confirmer le mot de passe",
+          "validation": {
+            "required": "La confirmation du mot de passe est requise.",
+            "mustMatch": "Les mots de passe ne correspondent pas."
+          }
+        }
+      }
+    },
+    "common": {
+      "submit": "Soumettre"
+    }
+  },
+  "signup": {
+    "common": {
+      "registerAccountTo": "Créez un compte chez Aiglusoft",
+      "signUpToContinue": "Inscrivez-vous pour accéder aux différents services proposés par Aiglusoft.",
+      "next": "Suivant",
+      "submit": "Soumettre",
+      "back": "Retour",
+      "skip": "Passer",
+      "close": "Fermer",
+      "accept": "Accepter",
+      "initializingAccount": "Initialisation de votre compte...",
+      "readAndAccept": "Lire et Accepter"
+    },
+    "components": {
+      "name": {
+        "title": "Créez un compte chez Aiglusoft",
+        "instructions": "Veuillez saisir votre nom.",
+        "firstName": {
+          "label": "Prénom",
+          "validation": {
+            "required": "Ce champ est obligatoire",
+            "minLength": "Ce champ doit contenir au moins {{minLength}} caractères"
+          }
+        },
+        "lastName": {
+          "label": "Nom",
+          "validation": {
+            "required": "Ce champ est obligatoire",
+            "minLength": "Ce champ doit contenir au moins {{minLength}} caractères"
+          }
+        }
+      },
+      "generalInfo": {
+        "title": "Informations générales",
+        "instructions": "Veuillez fournir votre date de naissance et votre genre.",
+        "birthDate": {
+          "label": "Date de naissance",
+          "validation": {
+            "required": "Ce champ est obligatoire"
+          }
+        },
+        "gender": {
+          "label": "Genre",
+          "placeholder": "Sélectionnez votre genre",
+          "male": "Homme",
+          "female": "Femme",
+          "other": "Autre",
+          "validation": {
+            "required": "Ce champ est obligatoire"
+          }
+        }
+      },
+      "email": {
+        "title": "Votre adresse e-mail",
+        "instructions": "Veuillez saisir votre adresse e-mail que vous souhaitez utiliser pour votre compte Aiglusoft.",
+        "label": "Adresse e-mail",
+        "help": "Vous devez confirmer que cette adresse e-mail vous appartient.",
+        "validation": {
+          "required": "Ce champ est obligatoire",
+          "email": "Veuillez fournir une adresse e-mail valide"
+        }
+      },
+      "emailVerification": {
+        "title": "Valider votre addresse e-mail",
+        "instructions": "Saisissez le code de validation que nous avons envoyé à {{emailAddress}}. Si vous ne trouvez pas le message, vérifiez dans votre dossier de spam.",
+        "code": {
+          "label": "Code de vérification",
+          "validation": {
+            "required": "Ce champ est obligatoire",
+            "minLength": "Ce champ doit contenir au moins {{minLength}} caractères"
+          }
+        }
+      },
+      "password": {
+        "title": "Mot de passe sécurisé",
+        "instructions": "Créez un mot de passe sécurisé avec des lettres, des chiffres et des symboles.",
+        "label": "Mot de passe",
+        "confirmLabel": "Confirmez le mot de passe",
+        "validation": {
+          "required": "Ce champ est obligatoire",
+          "minLength": "Ce champ doit contenir au moins {{minLength}} caractères"
+        }
+      },
+      "phone": {
+        "title": "Ajouter votre numéro tél.",
+        "label": "Numéro de téléphone",
+        "help": "Aiglusoft utilisera ce numéro uniquement pour la sécurité de votre compte. Il restera confidentiel, mais vous pourrez choisir de l'utiliser à d'autres fins plus tard.",
+        "validation": {
+          "required": "Ce champ est obligatoire",
+          "pattern": "Veuillez fournir un numéro de téléphone valide"
+        }
+      },
+      "phoneVerification": {
+        "title": "Valider le numéro tél.",
+        "instructions": "Saisissez le code de validation que nous avons envoyé au votre {{phoneNumber}}.",
+        "code": {
+          "label": "Code de vérification",
+          "validation": {
+            "required": "Ce champ est obligatoire",
+            "minLength": "Ce champ doit contenir au moins {{minLength}} caractères"
+          }
+        }
+      },
+      "review": {
+        "title": "Vérifiez vos informations",
+        "instructions": "Veuillez vérifier les informations fournies.",
+        "firstName": {
+          "label": "Prénom"
+        },
+        "lasteName": {
+          "label": "Nom"
+        },
+        "birthDate": {
+          "label": "Date de naissance"
+        },
+        "gender": {
+          "label": "Genre"
+        },
+        "email": {
+          "label": "Adresse e-mail"
+        },
+        "phoneNumber": {
+          "label": "Numéro de téléphone"
+        }
+      },
+      "terms": {
+        "modalTitle": "Conditions Générales",
+        "content": "Contenu des conditions générales...",
+        "accept": "J'accepte les conditions générales",
+        "read": "Lire les conditions générales",
+        "validation": {
+          "required": "Vous devez accepter les conditions générales pour continuer"
+        }
+      },
+      "reviewAndTerms": {
+        "title": "Vérifiez et acceptez les conditions",
+        "instructions": "Veuillez vérifier vos informations et accepter les conditions pour continuer."
+      },
+      "footer": {
+        "help": "Aide",
+        "privacy": "Confidentialité",
+        "terms": "Conditions"
+      }
+    }
+  },
+  "unauthorized": {
+    "message": "Vous n'êtes pas autorisé à accéder à cette page.",
+    "login": "Retour à la connexion"
+  }
+}

@@ -10,6 +10,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aiglusoft.IAM.Server.Controllers
@@ -29,6 +30,7 @@ namespace Aiglusoft.IAM.Server.Controllers
       _rootContext = rootContext;
     }
 
+    [Authorize(Policy = "CookiePolicy")]
     [HttpGet("authorize")]
     public async Task<IActionResult> Authorize()
     {

@@ -32,12 +32,7 @@
 						"tsConfig": "tsconfig.app.json",
 						"assets": [
 							"src/favicon.ico",
-							"src/assets",
-							{
-								"input": "node_modules/@aiglusoft/angular/assets",
-								"glob": "**/*",
-								"output": "assets"
-							}
+							"src/assets"
 						],
 						"styles": [
 							"node_modules/@aiglusoft/angular/styles/main.scss"

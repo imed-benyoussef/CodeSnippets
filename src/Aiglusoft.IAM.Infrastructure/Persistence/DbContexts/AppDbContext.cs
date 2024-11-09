@@ -82,7 +82,7 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts
       // Configure AuthorizationCode entity
       modelBuilder.Entity<AuthorizationCode>(entity =>
       {
-        entity.HasKey(e => e.AuthorizationCodeId);
+        entity.HasKey(e => e.Id);
         entity.HasOne(e => e.Client).WithMany().HasForeignKey(e => e.ClientId);
         entity.HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId);
       });

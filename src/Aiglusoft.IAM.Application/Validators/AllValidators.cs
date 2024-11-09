@@ -36,8 +36,8 @@ namespace Aiglusoft.IAM.Application.Validators
                 .Must(method => method == "S256" || method == "plain").WithErrorCode("invalid_request").WithMessage("CodeChallengeMethod must be either 'S256' or 'plain'.")
                 .When(x => !string.IsNullOrEmpty(x.CodeChallenge));
 
-            RuleFor(x => x.Nonce).Cascade(CascadeMode.Stop)
-                .NotEmpty().When(x => x.Scope.Contains("openid")).WithErrorCode("invalid_request").WithMessage("Nonce is required for OpenID Connect.");
+            //RuleFor(x => x.Nonce).Cascade(CascadeMode.Stop)
+            //    .NotEmpty().When(x => x.Scope.Contains("openid")).WithErrorCode("invalid_request").WithMessage("Nonce is required for OpenID Connect.");
 
             RuleFor(x => x.Display).Cascade(CascadeMode.Stop)
                 .Must(BeAValidDisplayType).WithErrorCode("invalid_request").WithMessage("Invalid display type.");

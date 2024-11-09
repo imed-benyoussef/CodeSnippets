@@ -24,7 +24,7 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
 
             modelBuilder.Entity("Aiglusoft.IAM.Domain.Model.AuthorizationAggregates.AuthorizationCode", b =>
                 {
-                    b.Property<string>("AuthorizationCodeId")
+                    b.Property<string>("Id")
                         .HasColumnType("text");
 
                     b.Property<string>("ClientId")
@@ -58,7 +58,7 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("AuthorizationCodeId");
+                    b.HasKey("Id");
 
                     b.HasIndex("ClientId");
 
@@ -85,8 +85,6 @@ namespace Aiglusoft.IAM.Infrastructure.Persistence.DbContexts.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClientId");
 
                     b.ToTable("Client");
                 });

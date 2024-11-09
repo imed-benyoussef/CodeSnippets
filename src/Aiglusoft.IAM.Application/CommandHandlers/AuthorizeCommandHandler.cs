@@ -79,7 +79,7 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
             }
 
             // Validate user
-            var userId =  _rootContext.FindFirstValue(JwtClaimTypes.Sub);
+            var userId =  _rootContext.FindFirstValue(JwtClaimTypes.Sub) ?? _rootContext.FindFirstValue(JwtClaimTypes.UniqueName);
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {

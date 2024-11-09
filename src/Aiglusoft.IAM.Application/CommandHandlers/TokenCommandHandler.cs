@@ -46,7 +46,7 @@ namespace Aiglusoft.IAM.Application.CommandHandlers
 
             // Validate the authorization code
             var authorizationCode = await _authorizationCodeRepository.GetByCodeAsync(request.Code);
-            if (authorizationCode == null || authorizationCode.ClientId != request.ClientId || authorizationCode.IsExpired())
+            if (authorizationCode == null || authorizationCode.ClientId != client.Id || authorizationCode.IsExpired())
             {
                 throw new Exceptions.UnauthorizedAccessException(_localizerErrorMessages, "InvalidAuthorizationCode");
             }
