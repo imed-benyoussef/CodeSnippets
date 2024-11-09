@@ -15,20 +15,6 @@ import { environment } from '../environments/environment';
 const routes: Routes = [
   {
 
-    path: 'dashboard',
-    loadChildren: async () => {
-      return loadRemoteModule({
-        remoteEntry: `${environment.accountRemoteEntry}/remoteEntry.js`,
-        remoteName: 'account',
-        exposedModule: './AccountModule',
-      }).then(m => m.AccountModule).catch(err => {
-        console.error(err);
-        return import('./fallbacks/account-fallback.module').then(e => e.AccountFallbackModule)
-      });
-    },
-  },
-  {
-
     path: 'signin',
     loadChildren: () => import('./signin/signin.module').then(e => e.SigninModule)
     ,
