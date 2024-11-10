@@ -1,5 +1,5 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
@@ -9,24 +9,22 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { RouterModule, Routes } from '@angular/router';
-import { loadRemoteModule } from '@angular-architects/module-federation';
 import { environment } from '../environments/environment';
 
 const routes: Routes = [
+  // ...existing code...
   {
-
-    path: 'signin',
-    loadChildren: () => import('./signin/signin.module').then(e => e.SigninModule)
-    ,
+    path: '',
+    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
   },
   {
-    path: 'signup',
-    loadChildren: () => import('./signup/signup.module').then(e => e.SignupModule),
+    path: 'mfa',
+    loadChildren: () => import('./features/mfa/mfa.module').then(m => m.MfaModule)
   },
-  // Redirect to signin by default
-  { path: '', redirectTo: '/signin', pathMatch: 'full' },
-  // Wildcard route for a 404 page (not found)
-  //{ path: '**', redirectTo: '/signup' }
+  {
+    path: 'account',
+    loadChildren: () => import('./features/account/account.module').then(m => m.AccountModule)
+  }
 ];
 
 @NgModule({
@@ -38,9 +36,10 @@ const routes: Routes = [
     BrowserModule,
     TranslateModule.forRoot(),
     RouterModule.forRoot(routes),
-    StoreModule.forRoot({}),
     EffectsModule.forRoot([]),
-    StoreDevtoolsModule.instrument()
+    StoreDevtoolsModule.instrument(),
+    StoreModule.forRoot({}, {}),
+    !environment.production ? StoreDevtoolsModule.instrument() : [],
 
   ],
 
