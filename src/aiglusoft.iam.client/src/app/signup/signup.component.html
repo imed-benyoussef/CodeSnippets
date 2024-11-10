@@ -1,28 +1,153 @@
-<div class="account-pages">
-  <div class="container">
-    <div class="row g-0 justify-content-center align-items-center">
-      <div class="col-md-6 col-sm-12 bg-white">
-        <div class="auth-box">
-          <div class="mb-4 mb-md-5 text-center">
-            <a href="javascript:void(0);" class="auth-logo">
-              <img src="assets/images/logo-dark.png" height="24" alt="" />
-            </a>
-          </div>
-          <div class="auth-content">
+<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <img class="mx-auto h-10 w-auto" src="/assets/images/logo-dark.png" height="24" alt="Your Company">
+  </div>
+  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+    <h2 class="text-2xl font-bold mb-6">{{ 'signup.component.title' | translate }}</h2>
+    <form class="space-y-6" [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <!-- Messages d'erreur généraux -->
+      <!-- <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+        {{ errorMessage }}
+      </div> -->
 
-            <!-- <div [@routeAnimations]="prepareRoute(outlet)"> -->
-            <div>
-              <router-outlet #outlet="outlet"></router-outlet>
+      <!-- Informations Personnelles -->
+      <div class="flex flex-col space-y-4">
+        <!-- Prénom et Nom -->
+        <div class="flex space-x-4">
+          <div class="w-1/2">
+            <label class="block text-sm/6 font-medium text-gray-900" for="firstName">{{ 'signup.component.firstName' | translate }}</label>
+            <input type="text" id="firstName" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+              formControlName="firstName"
+              [ngClass]="{
+                'border-red-500': signupForm.controls['firstName'].invalid && (signupForm.controls['firstName'].dirty || signupForm.controls['firstName'].touched)
+              }"
+              placeholder="{{ 'signup.component.enterFirstName' | translate }}" />
+            <div *ngIf="signupForm.controls['firstName'].invalid && (signupForm.controls['firstName'].dirty || signupForm.controls['firstName'].touched)"
+              class="text-red-500 text-sm mt-1">
+              <div *ngIf="signupForm.controls['firstName'].errors?.['required']">
+                {{ 'signup.component.errors.firstNameRequired' | translate }}
+              </div>
+            </div>
+          </div>
+          <div class="w-1/2">
+            <label class="block text-sm/6 font-medium text-gray-900" for="lastName">{{ 'signup.component.lastName' | translate }}</label>
+            <input type="text" id="lastName" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+              formControlName="lastName"
+              [ngClass]="{
+                'border-red-500': signupForm.controls['lastName'].invalid && (signupForm.controls['lastName'].dirty || signupForm.controls['lastName'].touched)
+              }"
+              placeholder="{{ 'signup.component.enterLastName' | translate }}" />
+            <div *ngIf="signupForm.controls['lastName'].invalid && (signupForm.controls['lastName'].dirty || signupForm.controls['lastName'].touched)"
+              class="text-red-500 text-sm mt-1">
+              <div *ngIf="signupForm.controls['lastName'].errors?.['required']">
+                {{ 'signup.component.errors.lastNameRequired' | translate }}
+              </div>
             </div>
           </div>
         </div>
-      
-      </div>
-      <div class="row g-0 justify-content-center align-items-center">
-        <div class="col-md-6 col-sm-12">
-         <app-footer></app-footer>
+        
+        <!-- Date de naissance et Genre -->
+        <div class="flex space-x-4">
+          <div class="w-1/2">
+            <label class="block text-sm/6 font-medium text-gray-900" for="birthdate">{{ 'signup.component.birthdate' | translate }}</label>
+            <input type="date" id="birthdate" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+              formControlName="birthdate"
+              [ngClass]="{
+                'border-red-500': signupForm.controls['birthdate'].invalid && (signupForm.controls['birthdate'].dirty || signupForm.controls['birthdate'].touched)
+              }"
+              placeholder="{{ 'signup.component.enterBirthdate' | translate }}" />
+            <div *ngIf="signupForm.controls['birthdate'].invalid && (signupForm.controls['birthdate'].dirty || signupForm.controls['birthdate'].touched)"
+              class="text-red-500 text-sm mt-1">
+              <div *ngIf="signupForm.controls['birthdate'].errors?.['required']">
+                {{ 'signup.component.errors.birthdateRequired' | translate }}
+              </div>
+            </div>
+          </div>
+          <div class="w-1/2">
+            <label class="block text-sm/6 font-medium text-gray-900" for="gender">{{ 'signup.component.gender' | translate }}</label>
+            <select id="gender" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+              formControlName="gender"
+              [ngClass]="{
+                'border-red-500': signupForm.controls['gender'].invalid && (signupForm.controls['gender'].dirty || signupForm.controls['gender'].touched)
+              }">
+              <option value="male">{{ 'signup.component.genderMale' | translate }}</option>
+              <option value="female">{{ 'signup.component.genderFemale' | translate }}</option>
+              <option value="other">{{ 'signup.component.genderOther' | translate }}</option>
+            </select>
+            <div *ngIf="signupForm.controls['gender'].invalid && (signupForm.controls['gender'].dirty || signupForm.controls['gender'].touched)"
+              class="text-red-500 text-sm mt-1">
+              <div *ngIf="signupForm.controls['gender'].errors?.['required']">
+                {{ 'signup.component.errors.genderRequired' | translate }}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+      
+      <!-- Informations de Contact -->
+      <div class="mb-4">
+        <label class="block text-sm/6 font-medium text-gray-900" for="email">{{ 'signup.component.email' | translate }}</label>
+        <input type="email" id="email" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+          formControlName="email"
+          [ngClass]="{
+            'border-red-500': signupForm.controls['email'].invalid && (signupForm.controls['email'].dirty || signupForm.controls['email'].touched)
+          }"
+          placeholder="{{ 'signup.component.enterEmail' | translate }}" />
+        <div *ngIf="signupForm.controls['email'].invalid && (signupForm.controls['email'].dirty || signupForm.controls['email'].touched)"
+          class="text-red-500 text-sm mt-1">
+          <div *ngIf="signupForm.controls['email'].errors?.['required']">
+            {{ 'signup.component.errors.emailRequired' | translate }}
+          </div>
+          <div *ngIf="signupForm.controls['email'].errors?.['email']">
+            {{ 'signup.component.errors.emailInvalid' | translate }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <label class="block text-sm/6 font-medium text-gray-900" for="verificationCode">{{ 'signup.component.verificationCode' | translate }}</label>
+        <input type="text" id="verificationCode" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+          formControlName="verificationCode"
+          [ngClass]="{
+            'border-red-500': signupForm.controls['verificationCode'].invalid && (signupForm.controls['verificationCode'].dirty || signupForm.controls['verificationCode'].touched)
+          }"
+          placeholder="{{ 'signup.component.enterVerificationCode' | translate }}" />
+        <div *ngIf="signupForm.controls['verificationCode'].invalid && (signupForm.controls['verificationCode'].dirty || signupForm.controls['verificationCode'].touched)"
+          class="text-red-500 text-sm mt-1">
+          <div *ngIf="signupForm.controls['verificationCode'].errors?.['required']">
+            {{ 'signup.component.errors.verificationCodeRequired' | translate }}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Informations de Sécurité -->
+      <div class="mb-4">
+        <label class="block text-sm/6 font-medium text-gray-900" for="password">{{ 'signup.component.password' | translate }}</label>
+        <input type="password" id="password" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+          formControlName="password"
+          [ngClass]="{
+            'border-red-500': signupForm.controls['password'].invalid && (signupForm.controls['password'].dirty || signupForm.controls['password'].touched)
+          }"
+          placeholder="{{ 'signup.component.enterPassword' | translate }}" />
+        <div *ngIf="signupForm.controls['password'].invalid && (signupForm.controls['password'].dirty || signupForm.controls['password'].touched)"
+          class="text-red-500 text-sm mt-1">
+          <div *ngIf="signupForm.controls['password'].errors?.['required']">
+            {{ 'signup.component.errors.passwordRequired' | translate }}
+          </div>
+          <div *ngIf="signupForm.controls['password'].errors?.['minlength']">
+            {{ 'signup.component.errors.passwordMinlength' | translate }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Bouton de soumission -->
+      <div class="text-center mt-3">
+        <button
+          class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+          type="submit">
+          {{ 'signup.component.submit' | translate }}
+        </button>
+      </div>
+    </form>
   </div>
 </div>

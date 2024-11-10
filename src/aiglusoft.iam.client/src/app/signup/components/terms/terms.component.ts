@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { TermsService } from '../../services/terms.service';
-import * as bootstrap from 'bootstrap';
 
 @Component({
   selector: 'app-terms',
@@ -73,8 +72,9 @@ export class TermsComponent implements OnInit {
   openTermsModal() {
     const modalElement = document.getElementById('termsModal');
     if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
+      //const modal = new bootstrap.Modal(modalElement);
+      //modal.show();
+      alert("openTermsModal");
     }
   }
 
@@ -88,8 +88,10 @@ export class TermsComponent implements OnInit {
     this.termsAccepted.emit();
     const modalElement = document.getElementById('termsModal');
     if (modalElement) {
-      const modal = bootstrap.Modal.getInstance(modalElement);
-      modal?.hide();
+      //const modal = bootstrap.Modal.getInstance(modalElement);
+      //modal?.hide();
+
+      alert("acceptTerms");
     }
   }
 }

@@ -5,35 +5,59 @@ import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-name',
   template: `
-<app-layout title="signup.components.name.title" instructions="signup.components.name.instructions">
-  <form class="form-custom mt-3" [formGroup]="nameForm" (ngSubmit)="onSubmit()" novalidate>
-    <div class="mb-3">
-      <label class="form-label" for="firstName">{{ 'signup.components.name.firstName.label' | translate }}</label>
-      <input class="form-control" id="firstName" formControlName="firstName" [ngClass]="{
-        'is-invalid': nameForm.get('firstName')?.invalid && (nameForm.get('firstName')?.dirty || nameForm.get('firstName')?.touched)
-      }" />
-      <div class="invalid-feedback" *ngIf="nameForm.get('firstName')?.invalid && (nameForm.get('firstName')?.dirty || nameForm.get('firstName')?.touched)">
-        <small *ngIf="nameForm.get('firstName')?.errors?.['required']">{{ 'signup.components.name.firstName.validation.required' | translate }}</small>
-        <small *ngIf="nameForm.get('firstName')?.errors?.['minlength']">{{ 'signup.components.name.firstName.validation.minLength' | translate: { minLength: 2 } }}</small>
+    <app-layout title="signup.components.name.title" instructions="signup.components.name.instructions">
+      <form class="space-y-6 mt-3" [formGroup]="nameForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+      <div class="sm:col-span-3">
+          <label class="block text-sm font-medium text-gray-900" for="firstName">{{ 'signup.components.name.firstName.label' | translate }}</label>
+          <div class="mt-2">
+            <input type="text"
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm"
+              id="firstName" formControlName="firstName"
+              placeholder="{{ 'signup.components.name.firstName.placeholder' | translate }}" [ngClass]="{
+                'ring-red-500': nameForm.controls['firstName'].invalid && (nameForm.controls['firstName'].dirty || nameForm.controls['firstName'].touched)
+              }" />
+            <div *ngIf="nameForm.controls['firstName'].invalid && (nameForm.controls['firstName'].dirty || nameForm.controls['firstName'].touched)"
+              class="text-red-500 text-sm mt-1">
+              <div *ngIf="nameForm.controls['firstName'].errors?.['required']">
+                {{ 'signup.components.name.firstName.validation.required' | translate }}
+              </div>
+              <div *ngIf="nameForm.controls['firstName'].errors?.['minlength']">
+                {{ 'signup.components.name.firstName.validation.minLength' | translate: { minLength: 2 } }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sm:col-span-3">
+          <label class="block text-sm font-medium text-gray-900" for="lastName">{{ 'signup.components.name.lastName.label' | translate }}</label>
+          <div class="mt-2">
+            <input type="text"
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm"
+              id="lastName" formControlName="lastName"
+              placeholder="{{ 'signup.components.name.lastName.placeholder' | translate }}" [ngClass]="{
+                'ring-red-500': nameForm.controls['lastName'].invalid && (nameForm.controls['lastName'].dirty || nameForm.controls['lastName'].touched)
+              }" />
+            <div *ngIf="nameForm.controls['lastName'].invalid && (nameForm.controls['lastName'].dirty || nameForm.controls['lastName'].touched)"
+              class="text-red-500 text-sm mt-1">
+              <div *ngIf="nameForm.controls['lastName'].errors?.['required']">
+                {{ 'signup.components.name.lastName.validation.required' | translate }}
+              </div>
+              <div *ngIf="nameForm.controls['lastName'].errors?.['minlength']">
+                {{ 'signup.components.name.lastName.validation.minLength' | translate: { minLength: 2 } }}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="mb-5">
-      <label class="form-label" for="lastName">{{ 'signup.components.name.lastName.label' | translate }}</label>
-      <input class="form-control" id="lastName" formControlName="lastName" [ngClass]="{
-        'is-invalid': nameForm.get('lastName')?.invalid && (nameForm.get('lastName')?.dirty || nameForm.get('lastName')?.touched)
-      }" />
-      <div class="invalid-feedback" *ngIf="nameForm.get('lastName')?.invalid && (nameForm.get('lastName')?.dirty || nameForm.get('lastName')?.touched)">
-        <small *ngIf="nameForm.get('lastName')?.errors?.['required']">{{ 'signup.components.name.lastName.validation.required' | translate }}</small>
-        <small *ngIf="nameForm.get('lastName')?.errors?.['minlength']">{{ 'signup.components.name.lastName.validation.minLength' | translate: { minLength: 2 } }}</small>
-      </div>
-    </div>
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-      <button class="btn btn-success rounded-pill shadow-none" type="submit" [disabled]="nameForm.invalid">{{ 'signup.common.next' | translate }}</button>
-    </div>
-  </form>
-</app-layout>
-
-
+        <div class="text-center mt-3">
+          <button
+            class="w-full flex justify-center rounded-md bg-green-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-600 disabled:opacity-50"
+            type="submit" [disabled]="nameForm.invalid">
+            {{ 'signup.common.next' | translate }}
+          </button>
+        </div>
+      </form>
+    </app-layout>
   `
 })
 export class NameComponent implements OnInit {

@@ -44,7 +44,7 @@ const routes: Routes = [
 
   ],
 
-  providers: [provideHttpClient()]
+  providers: [provideHttpClient(withInterceptorsFromDi())]
 })
 export class AppModule {
   constructor(private translate: TranslateService) {
