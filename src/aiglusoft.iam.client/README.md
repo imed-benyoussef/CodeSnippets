@@ -51,8 +51,8 @@ Voici un plan d'action complet pour la mise en place d'une architecture scalable
 
 ### **Étape 3 : Implémentation de l'authentification de base (Auth Module)**
 
-1. **Création des composants pour les pages d’authentification** :
-   - `LoginComponent`, `SignUpComponent`, `PasswordResetComponent`, etc.
+1. **Création des composants pour les pages d'authentification** :
+   - `LoginComponent`, `SignUpComponent`, `PasswordResetComponent`, `ConsentComponent`, etc.
 
 2. **Implémentation du service d'authentification (AuthService)** :
    - Configurez `AuthService` pour gérer les appels d'authentification, la gestion des tokens et les redirections.
@@ -64,6 +64,19 @@ Voici un plan d'action complet pour la mise en place d'une architecture scalable
 4. **Mise en place des gardes de routes (guards)** :
    - Créez `AuthGuard` pour sécuriser les routes qui nécessitent une authentification.
    - Ajoutez des conditions de redirection en cas de non-authentification.
+
+5. **Implémentation du service de consentement (ConsentService)** :
+   - Créez un service pour gérer les autorisations et les demandes de consentement
+   - Gérez les scopes et les permissions demandées par les applications clientes
+   - Stockez les préférences de consentement de l'utilisateur
+   - Implémentez la logique pour afficher/masquer la page de consentement selon l'historique
+
+6. **Page de consentement** :
+   - Affichez clairement les permissions demandées par l'application
+   - Listez les données personnelles qui seront partagées
+   - Proposez des options pour accepter/refuser des permissions spécifiques
+   - Permettez de mémoriser le choix pour les futures connexions
+   - Incluez des liens vers la politique de confidentialité et les conditions d'utilisation
 
 ---
 
@@ -167,9 +180,7 @@ Voici un plan d'action complet pour la mise en place d'une architecture scalable
 
 3. **Amélioration continue** :
    - Recueillez les retours des utilisateurs pour améliorer les flux d'authentification.
-   - Optimisez les performances et améliorez l
-
-’accessibilité pour maintenir une expérience utilisateur de qualité.
+   - Optimisez les performances et améliorez l’accessibilité pour maintenir une expérience utilisateur de qualité.
 
 ---
 

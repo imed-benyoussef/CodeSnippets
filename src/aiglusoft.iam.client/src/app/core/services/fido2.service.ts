@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class Fido2Service {
-  private baseUrl = 'api/fido2';
+  private baseUrl = '/api/fido2';
 
   constructor(private http: HttpClient) {}
 

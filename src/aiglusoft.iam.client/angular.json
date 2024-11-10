@@ -47,7 +47,13 @@
 						"production": {
 							"budgets": [],
 							"outputHashing": "all",
-							"extraWebpackConfig": "webpack.prod.config.js"
+							"extraWebpackConfig": "webpack.prod.config.js",
+							"fileReplacements": [
+								{
+									"replace": "src/environments/environment.ts",
+									"with": "src/environments/environment.prod.ts"
+								}
+							]
 						},
 						"development": {
 							"optimization": false,
