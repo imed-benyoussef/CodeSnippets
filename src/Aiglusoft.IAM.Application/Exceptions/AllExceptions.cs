@@ -89,4 +89,15 @@ namespace Aiglusoft.IAM.Application.Exceptions
     }
 
 
+    public class ClientNotFoundException : AppException
+    {
+        public ClientNotFoundException(IStringLocalizer localizer, string resourceKey, params object[] args) : base(localizer, resourceKey, args)
+        {
+        }
+    }
+
+
+
+
+
 }

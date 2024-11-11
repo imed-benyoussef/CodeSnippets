@@ -5,6 +5,7 @@ using Asp.Versioning;
 using Aiglusoft.IAM.Application.UseCases.Clients.CreateClient;
 using Aiglusoft.IAM.Application.UseCases.Clients.GetClients;
 using static Microsoft.AspNetCore.Http.StatusCodes;
+using Aiglusoft.IAM.Application.UseCases.Clients.GetClient;
 
 namespace Aiglusoft.IAM.Server.Controllers
 {
@@ -59,5 +60,17 @@ namespace Aiglusoft.IAM.Server.Controllers
       var result = await _mediator.Send(command);
       return Ok(result);
     }
+
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetClient(string id)
+    {
+   
+        var query = new GetClientQuery(id);
+        var result = await _mediator.Send(query);
+        return Ok(result);
+
+    }
   }
+
 }

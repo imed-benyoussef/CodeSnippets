@@ -168,4 +168,7 @@
   <data name="UserAlreadyExists" xml:space="preserve">
     <value>Un compte avec l'adresse email '{0}' existe déjà.</value>
   </data>
+  <data name="ClientNotFound" xml:space="preserve">
+    <value>Le client avec ClientID {0} n'a pas été trouvé.</value>
+  </data>
 </root>
