@@ -2,7 +2,7 @@ export const environment = {
     production: true,
     defaultLanguage: '__DEFAULT_LANGUAGE__',
     translationUrl: '__TRANSLATION_URL__',
-    apiUrl: 'https://api.aiglusoft.com/api',
+    apiUrl: '/',
     oidc: {
       issuer: 'https://identity.aiglusoft.com',
       clientId: 'iam-client',
