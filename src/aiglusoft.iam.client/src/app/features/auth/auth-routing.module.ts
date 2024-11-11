@@ -7,11 +7,11 @@ import { PasswordResetComponent } from './password-reset/password-reset.componen
 import { ConsentComponent } from './consent/consent.component';
 
 const routes: Routes = [
-  { path: 'login', component: LoginComponent },
+  { path: 'signin', component: LoginComponent },
   { path: 'sign-up', component: SignUpComponent },
   { path: 'password-reset', component: PasswordResetComponent },
   { path: 'consent', component: ConsentComponent },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'signin', pathMatch: 'full' },
 ];
 
 @NgModule({

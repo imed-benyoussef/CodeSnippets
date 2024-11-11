@@ -6,6 +6,7 @@ export interface MfaMethod {
   type: 'totp' | 'sms' | 'fido2';
   isEnabled: boolean;
   lastUsed?: Date;
+  identifier?: string; // Phone number for SMS, key handle for FIDO2
 }
 
 @Injectable({
@@ -42,5 +43,13 @@ export class MfaService {
 
   verifyFido2(response: any): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/verify-fido2`, response);
+  }
+
+  activateMfa(method: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/activate`, { method });
+  }
+
+  verifyMfa(code: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/verify`, { code });
   }
 }

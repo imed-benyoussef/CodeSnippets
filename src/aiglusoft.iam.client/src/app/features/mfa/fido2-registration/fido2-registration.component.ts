@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Fido2Service } from '../fido2.service';
+import { Fido2Service } from '../services/fido2.service';
 
 @Component({
   selector: 'app-fido2-registration',

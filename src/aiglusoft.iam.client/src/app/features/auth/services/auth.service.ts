@@ -7,13 +7,13 @@ import { tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  private authUrl = '/api/auth';
+  private authUrl = '/api/v1';
   private tokenSubject = new BehaviorSubject<string | null>(null);
 
   constructor(private http: HttpClient) { }
 
-  login(credentials: { email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.authUrl}/login`, credentials).pipe(
+  login(credentials: { username: string; password: string }): Observable<any> {
+    return this.http.post(`${this.authUrl}/account/login`, credentials).pipe(
       tap((response: any) => {
         this.setToken(response.token);
       })

@@ -14,6 +14,11 @@ import { EffectsModule } from '@ngrx/effects';
 import { authReducer } from './store/auth.reducer';
 import { AuthEffects } from './store/auth.effects';
 import { ConsentComponent } from './consent/consent.component';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { environment } from '@env/environment';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+
 
 @NgModule({
   declarations: [
@@ -27,7 +32,13 @@ import { ConsentComponent } from './consent/consent.component';
     AuthRoutingModule,
     ReactiveFormsModule,
     StoreModule.forFeature('auth', authReducer),
-    EffectsModule.forFeature([AuthEffects])
-  ]
+    EffectsModule.forFeature([AuthEffects]),    
+    TranslateModule,
+  ],
+  
 })
-export class AuthModule { }
+export class AuthModule { 
+  constructor(private translate: TranslateService) {
+    // this.translate.setDefaultLang('fr');
+  }
+}

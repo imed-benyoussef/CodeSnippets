@@ -1,7 +1,7 @@
 <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-        <img class="mx-auto h-10 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company">
-        <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Sign in to your account</h2>
+        <img class="mx-auto h-8 w-auto" src="assets/images/logo-dark.png" alt="{{ 'COMMON.COMPANY_NAME' | translate }}">
+        <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">{{ 'AUTH.LOGIN.TITLE' | translate }}</h2>
     </div>
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -10,17 +10,17 @@
         </div>
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
             <div>
-                <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
+                <label for="username" class="block text-sm/6 font-medium text-gray-900">{{ 'AUTH.LOGIN.USERNAME' | translate }}</label>
                 <div class="mt-2">
-                    <input id="email" formControlName="email" type="email" autocomplete="email" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+                    <input id="username" formControlName="username" type="text" autocomplete="username" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
                 </div>
             </div>
 
             <div>
                 <div class="flex items-center justify-between">
-                    <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
+                    <label for="password" class="block text-sm/6 font-medium text-gray-900">{{ 'AUTH.LOGIN.PASSWORD' | translate }}</label>
                     <div class="text-sm">
-                        <a routerLink="../password-reset" class="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+                        <a routerLink="../password-reset" class="font-semibold text-indigo-600 hover:text-indigo-500">{{ 'AUTH.LOGIN.FORGOT_PASSWORD' | translate }}</a>
                     </div>
                 </div>
                 <div class="mt-2">
@@ -32,15 +32,15 @@
                 <button type="submit" 
                         [disabled]="loginForm.invalid || isLoading" 
                         class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                    <span *ngIf="!isLoading">Sign in</span>
-                    <span *ngIf="isLoading">Loading...</span>
+                    <span *ngIf="!isLoading">{{ 'AUTH.LOGIN.SIGN_IN' | translate }}</span>
+                    <span *ngIf="isLoading">{{ 'AUTH.LOGIN.LOADING' | translate }}</span>
                 </button>
             </div>
         </form>
 
         <p class="mt-10 text-center text-sm/6 text-gray-500">
-            Not a member?
-            <a routerLink="../sign-up" class="font-semibold text-indigo-600 hover:text-indigo-500">Create an account</a>
+            {{ 'AUTH.LOGIN.NOT_A_MEMBER' | translate }}
+            <a routerLink="../sign-up" class="font-semibold text-indigo-600 hover:text-indigo-500">{{ 'AUTH.LOGIN.CREATE_ACCOUNT' | translate }}</a>
         </p>
     </div>
 </div>
