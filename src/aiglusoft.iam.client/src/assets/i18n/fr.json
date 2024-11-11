@@ -50,6 +50,14 @@
       "SUBMIT": "Envoyer la demande",
       "SUCCESS": "Les instructions ont été envoyées à votre email",
       "ERROR": "Une erreur s'est produite"
+    },
+    "CONSENT": {
+      "TITLE": "Demande d'autorisation",
+      "WANTS_ACCESS": "souhaite accéder à votre compte",
+      "APP_REQUESTS": "Cette application demande l'accès à :",
+      "REMEMBER_CHOICE": "Se souvenir de mon choix pour cette application",
+      "ALLOW": "Autoriser",
+      "DENY": "Refuser"
     }
   }
 }

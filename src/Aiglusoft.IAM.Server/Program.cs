@@ -220,7 +220,7 @@ JsonWebTokenHandler.DefaultInboundClaimTypeMap.Remove("sub");
     })
    .AddCookie(options =>
    {
-     options.LoginPath = "/signin";
+     options.LoginPath = "/login";
      options.AccessDeniedPath = "/accessdenied";
    });
 
